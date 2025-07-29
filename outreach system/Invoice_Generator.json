@@ -39,7 +39,7 @@
           "parameters": [
             {
               "name": "X-API-Key",
-              "value": "sk_5e48328d0101fbb2b618c9f708637b9f93efca50"
+              "value": "PDF Shift API_KEY"
             },
             {
               "name": "Content-Type",
