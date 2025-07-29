@@ -11,13 +11,16 @@ This portfolio includes:
 - 🧠 Autonomous AI Agents (multi-step decision making)
 - 🚀 And more coming soon...
 
+---
 
 # 🧾 Invoice Generator (Frontend)
 
 This is the frontend interface for the AI-powered Invoice Generator.
 
-- Live URL: https://builtinvoice.netlify.app/
+- Live URL: [Invice Generator](https://builtinvoice.netlify.app/)
 - Connected n8n Workflow: **outreach system/Invoice_Generator.json**
+
+---
 
 ## ⚙️ How It Works
 
@@ -26,12 +29,14 @@ This is the frontend interface for the AI-powered Invoice Generator.
 3. n8n processes data and triggers invoice creation logic.
 4. Output is returned as email.
 
+---
+
 # 🎬 ScriptCraft – AI-Powered YouTube Scriptwriter
 
-**ScriptCraft** is an intelligent YouTube scriptwriter tool that helps creators generate full-length, engaging video scripts with just a simple prompt. Powered by GPT-4 and automated using [n8n]it streamlines content creation for YouTubers, marketers, and educators.
+**ScriptCraft** is an intelligent YouTube scriptwriter tool that helps creators generate full-length, engaging video scripts with just a simple prompt. Powered by Gemini and automated using [n8n]it streamlines content creation for YouTubers, marketers, and educators.
 
 > 🚀 Live Tool: [Scripcraft](https://script-craft.lovable.app/)  
-> 🔗 Connected Workflow: [`YT_Scriptwriter.json`](../../Social%20media/YT_Scriptwriter.json)
+> 🔗 Connected Workflow: **Social media/YT_Scriptwriter.json**
 
 ---
 
