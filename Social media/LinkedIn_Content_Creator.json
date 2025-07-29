@@ -64,7 +64,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer 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"
+              "value": "Bearer api_key"
             }
           ]
         },
