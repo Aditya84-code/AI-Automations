@@ -1,0 +1,289 @@
+{
+  "name": "Vapi agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "1475bec3-00fc-4d28-9241-3978e8c12893",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        -40
+      ],
+      "id": "bd322982-e234-4321-bae7-5664531267b5",
+      "name": "Webhook",
+      "webhookId": "1475bec3-00fc-4d28-9241-3978e8c12893"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "options": {
+          "systemMessage": "=Role:\nYou are an AI appointment assistant for \"autopioltz,\" an AI automation agency. Your job is to process structured data received from Vapi voice calls {{ $json.data }} and automate appointment booking in Google Calendar, always using Indian Standard Time (IST, Asia/Kolkata).\n\nInstructions:\n\nThe data you receive will include the caller’s name, email, preferred appointment date and time, and the reason for the appointment.\n\nAlways use the data provided in as your primary source of truth. Do not ask the user for information again unless a required field is missing or unclear.\n\nBook appointment for 30 mins from the given user's time\nExample - Book an appointment for 2PM, return appoitment has been booked from 2PM TO 2:30PM with a suitable title\n\nYour workflow:\n\nCheck Data Completeness:\n\nIf any required field (name, phone, date, time, or reason) is missing or ambiguous, flag this and return a message specifying what is needed.\n\nFirst check the availablity of time slot using check slot\n\nCheck Calendar Availability:(Use check tool)\n\nUse the provided date and time using to check for available slots.\n\nIf the requested slot is unavailable, don't book any slot until you get a new time slot\n\nBook Appointment:(Use book tool)\n\nIf the slot is available, create the appointment in Google Calendar using all provided details.\n\nInclude the caller’s name and reason in the event description and a suitable title.\n\nConfirm the booking with a message such as:\n“Your appointment is booked for [date] at [time] with Aditya. Thank you for choosing autopioltz.”\n\nResponse:\n\nAlways respond in a clear, concise, and polite manner, summarizing the outcome and next steps.\n\nExample:\nIf all fields are present and the slot is available, book the appointment and confirm.\nIf the slot is unavailable, return alternative times.\nIf data is missing, specify what is needed.\n\ncurrent date and time : {{ $now }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -40
+      ],
+      "id": "997207f4-e035-45fa-ac06-d67e0fe4d151",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.message.artifact",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        -40
+      ],
+      "id": "3c0d56d4-ed85-4398-a75c-b0f97a8c2377",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "allFieldsExcept",
+        "fieldsToExclude": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        -40
+      ],
+      "id": "45c06cb6-eb3b-4bab-89ab-622996f3c5e0",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        180
+      ],
+      "id": "fb75008a-d455-441a-a5e8-01e35fd9b1d5",
+      "name": "2.0 Flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eAtLubPZWKpbiIWz",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "azcreation84@gmail.com",
+          "mode": "list",
+          "cachedResultName": "azcreation84@gmail.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Time', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End_Time', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        200,
+        180
+      ],
+      "id": "39aa2146-a76a-49d4-aa45-fd592712529f",
+      "name": "Check",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "eh0rT4PDj52MHgdL",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "azcreation84@gmail.com",
+          "mode": "list",
+          "cachedResultName": "azcreation84@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "location": "Asia/Kolkata (IST)"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        180
+      ],
+      "id": "981a1229-227a-46d6-81b8-ff7421fa8228",
+      "name": "book",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "eh0rT4PDj52MHgdL",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"results\": [\n    {\n      \"toolCallId\": \" {{ $('Webhook').item.json.body.message.artifact.messages[14].toolCalls[0].id }}\",\n      \"result\": \"Your message or data here\"\n    }\n  ]\n}\n",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.3,
+      "position": [
+        620,
+        -40
+      ],
+      "id": "b8c1d92e-1043-41dc-b688-80961632d8da",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        -40
+      ],
+      "id": "16fa0bbb-9736-4dbc-bcc8-4f2f690e329a",
+      "name": "Wait",
+      "webhookId": "925e06ea-5a7f-465b-ad4e-b9f9a94f47c1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.0 Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "book": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "9ddb1901-b82d-41a1-be90-0c6f16fb97f6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6e339f61095fe8ebf8d14b69dc87593ea5879729d658b948550957eac39461e0"
+  },
+  "id": "tx9FmKWwkjTx9UJ7",
+  "tags": []
+}

@@ -1,0 +1,221 @@
+{
+  "name": "Instagram lead generator",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Instagram Lead Scraper",
+        "formDescription": "Get instagram leads directly into Airtable",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Who are you looking?"
+            },
+            {
+              "fieldLabel": "Location"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fa3fc1b1-0dc8-4fbd-8648-51c7ddc92e0e",
+      "name": "On form submission",
+      "webhookId": "fd8bc5ca-cc1b-4576-9beb-d7fc3198c465"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~google-search-scraper/run-sync-get-dataset-items?token=REDACTED_TOKEN",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"focusOnPaidAds\": false,\n    \"forceExactMatch\": false,\n    \"includeIcons\": false,\n    \"includeUnfilteredResults\": false,\n    \"maxPagesPerQuery\": 1,\n    \"mobileResults\": false,\n    \"queries\": \"site:instagram.com + {{ $json['Who are you looking?'] }} {{ $json.Location }}\",\n    \"resultsPerPage\": 50,\n    \"saveHtml\": false,\n    \"saveHtmlToKeyValueStore\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "65e89275-fdd7-46f2-8683-292010ed9517",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        460,
+        0
+      ],
+      "id": "d9c7eb59-35cc-4ee2-a9cc-32f513b93830",
+      "name": "Wait",
+      "webhookId": "30435ba2-f4f5-40ab-9163-b92408de643f"
+    },
+    {
+      "parameters": {
+        "functionCode": "const raw = items[0].json.organicResults || [];\nconst structured = raw.map(r => ({\n  name:         r.title,\n  url:          r.url,\n  description:  r.description,\n  followers:    r.followersAmount || null,\n  position:     r.position,\n  channel:      r.channelName\n}));\nreturn structured.map(cafe => ({ json: cafe }));"
+      },
+      "name": "Structure Café Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        700,
+        0
+      ],
+      "id": "40d55e69-2a37-47c9-9453-0b71bf198b93"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1vfqF8WzxyKbIexRlmq3sQ_LA7T-wnPt0oJT6GvbmYuY",
+          "mode": "list",
+          "cachedResultName": "Instagram Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vfqF8WzxyKbIexRlmq3sQ_LA7T-wnPt0oJT6GvbmYuY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vfqF8WzxyKbIexRlmq3sQ_LA7T-wnPt0oJT6GvbmYuY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.name }}",
+            "description": "={{ $json.description }}",
+            "followers": "={{ $json.followers }}",
+            "Instagram": "={{ $json.url }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "followers",
+              "displayName": "followers",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        920,
+        0
+      ],
+      "id": "9c739d84-5963-4943-88e0-a9ce9772bbe2",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aMDwBXOAlaeayRdi",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Structure Café Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structure Café Data": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4866d85a-8eaa-4880-bee6-2b8842198371",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6e339f61095fe8ebf8d14b69dc87593ea5879729d658b948550957eac39461e0"
+  },
+  "id": "6m2F4Ws9c9KooaDD",
+  "tags": []
+}

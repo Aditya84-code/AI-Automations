@@ -1,0 +1,353 @@
+{
+  "name": "Outreach agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        0
+      ],
+      "id": "7ca650fc-6e14-4931-a778-0585c036179c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1fp-1M4Gz83RkRayLNEgoEgodNz8-tC3lJoU-Eic_hOw",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fp-1M4Gz83RkRayLNEgoEgodNz8-tC3lJoU-Eic_hOw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fp-1M4Gz83RkRayLNEgoEgodNz8-tC3lJoU-Eic_hOw/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Pending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        120,
+        0
+      ],
+      "id": "24bd33d1-a913-415a-9c10-2e932ecd2949",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aMDwBXOAlaeayRdi",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1fp-1M4Gz83RkRayLNEgoEgodNz8-tC3lJoU-Eic_hOw",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fp-1M4Gz83RkRayLNEgoEgodNz8-tC3lJoU-Eic_hOw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fp-1M4Gz83RkRayLNEgoEgodNz8-tC3lJoU-Eic_hOw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Done",
+            "Business name": "={{ $('Google Sheets').item.json['Business name'] }}"
+          },
+          "matchingColumns": [
+            "Business name"
+          ],
+          "schema": [
+            {
+              "id": "Business name",
+              "displayName": "Business name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Niche",
+              "displayName": "Niche",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1400,
+        20
+      ],
+      "id": "05b007c9-2b08-47e3-8ac2-be1e69f5cafa",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aMDwBXOAlaeayRdi",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        360,
+        0
+      ],
+      "id": "be689329-d6f7-419e-b854-f41f9ca8c814",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Business name: {{ $('Google Sheets').item.json['Business name'] }}\nNiche: {{ $('Google Sheets').item.json.Niche }}\n\nStructure the email in a clean professional way\nDon't just write full email in a sigle paragraph\nKeep the subject line short but attention grabbing just use single line hooks\n\nHere's a sample email write the email in this style and take inspiration from that template and email with unique touch for every business\n\n#Sample Template Structure\n\nSubject: How Would [Business Name]'s [Unique Aspect] Look Through a Creative Lens?\n\nHi there,\n\nI recently discovered [Business Name] and was truly inspired by [specific aspect of their business]. [Personalized observation about their unique value proposition].\n\nI've been exploring how AI-powered photography can [specific benefit related to their niche]—highlighting [relevant aspects of their business]. I thought you might enjoy seeing how this perspective could bring a fresh energy to your [relevant business aspect].\n\nI've put together a portfolio that might spark some inspiration for your next feature or event. I'd love to hear your thoughts if you have a moment!\n\nWarm regards,\nAditya\n",
+        "options": {
+          "systemMessage": "=You are an expert email outreach assistant that crafts and sends personalized emails while maintaining a consistent brand voice and style without sounding salesy.\n\nRole and Objective\n\nYour role is to send personalized outreach concise and short catchy and attention grabbing emails to businesses about AI-powered Food photography services,while maintaining a warm and professional tone while customizing the content based on the recipient's business and niche.\n\nInput Format\n\nYou will receive:\nBusiness Name\nBusiness Niche/Type\n\nInstructions\n\nAlways use follow a same style of email template but with some personalization according to business\n\nKeep the portfolio link constant: https://gamma.app/docs/Capture-the-Sizzle-AI-Food-Photography-for-Your-Brand-svw94822ouazwch\n\nGive the portfolio link in between the email where you talk about services\n\nAlways sign off as 'Aditya'\n\nMaintain a warm, professional and conversational tone\n\nShow genuine interest in the business\n\nFocus on value proposition relevant to their niche\n\nSubject Line Rules\n\nInclude the business name\n(e.g - Hi, Aroma cafe)\n\nCreate an engaging hook related to their niche\n\nKeep it personal and intriguing\n\n\nEmail Body Rules\n\nFirst paragraph: Show you've done research about their business but don't overflow it\n\nSecond paragraph: Connect AI photography to their specific needs\n\nThird paragraph: Mention portfolio and invite feedback\n\nStructure the main body of the email properly so that it doesn't look clutery\n\nWorkflow Steps\n\nAnalyze the business name and niche\n\nGenerate personalized subject (using hook strategy) \n\nGenerate personalized email body according to the business\n\n# Error Handling\n\nIf email sending fails, retry once after 5 minutes\n\nLog any failures for review\n\nEnsure all personalization fields are filled before sending\n\nFinal Check\n\nBefore sending each email:\n\nVerify all personalization is in place\n\nConfirm portfolio link is included\n\nCheck signature is 'Aditya'\n\nEnsure email maintains professional tone"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        600,
+        20
+      ],
+      "id": "9689a2e3-feb7-474d-ab88-aed898abdd57",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        200
+      ],
+      "id": "fc6ba7fc-1d74-45ee-9053-1df9483bee09",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wiX13pBaT5cGc9YS",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "instructions": "separate out the subject and structure the main body properly use new line according to the sentence from output",
+        "codeGeneratedForPrompt": "separate out the subject and structure the main body properly use new line according to the sentence from output",
+        "jsCode": "const items = $input.all();\nconst updatedItems = items.map((item) => {\n  const output = item?.json?.output;\n  const subjectIndex = output.indexOf(\"Subject:\");\n  const subjectEndIndex = output.indexOf(\"\\n\", subjectIndex);\n  const subject = output\n    .substring(subjectIndex, subjectEndIndex)\n    .replace(\"Subject:\", \"\")\n    .trim();\n  const body = output.substring(subjectEndIndex).trim().replace(/\\.\\s/g, \".\\n\");\n  return { subject, body };\n});\nreturn updatedItems;\n"
+      },
+      "type": "n8n-nodes-base.aiTransform",
+      "typeVersion": 1,
+      "position": [
+        980,
+        20
+      ],
+      "id": "d9ca4b21-d3f0-4158-ab15-3be5da28a976",
+      "name": "AI Transform"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets').item.json.Email }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.body }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        20
+      ],
+      "id": "4d8e3f3b-c1f2-469d-bef0-b5cdac21264e",
+      "name": "Gmail",
+      "webhookId": "e1ea1599-79d2-47c2-8c79-8fb9bf1e66a6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "MtJfrJPcN1TZuBjL",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Transform": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c168d499-985b-488b-b128-aff78e857c76",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6e339f61095fe8ebf8d14b69dc87593ea5879729d658b948550957eac39461e0"
+  },
+  "id": "Gm4ajD1ChVRXx4Pt",
+  "tags": []
+}

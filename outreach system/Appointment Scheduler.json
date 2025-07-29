@@ -1,0 +1,631 @@
+{
+  "name": "Appointment Scheduler",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "schedule_appointment",
+        "formTitle": "Schedule an Appointment",
+        "formDescription": "Welcome to Aditya's Appointment Form.\nBefore we set a date, please tell me a little about yourself and how I can help.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Your Name",
+              "placeholder": "eg. Sam Smith",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "placeholder": "eg. sam@example.com",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Enquiry",
+              "fieldType": "textarea",
+              "placeholder": "eg. I'm looking for...",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "ignoreBots": true,
+          "useWorkflowTimezone": true
+        }
+      },
+      "id": "a806b634-d2b2-4b2a-804a-1b576bc1a6a0",
+      "name": "n8n Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [
+        -1024,
+        208
+      ],
+      "webhookId": "5e7637dd-d222-4786-8cdc-7b66cebc1481",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Appointment Request Sent!",
+        "completionMessage": "=Thank you for submitting an appointment request. A confirmation of this request will be sent to your inbox. I'll get back to you shortly with a confirmation of the appointment.\n\nHere is the summary of the appointment request.\n\nName: {{ $('Get Form Values').item.json.name }}\nDate & Time: {{ DateTime.fromISO($('Get Form Values').item.json.dateTime).format('EEE, dd MMM @ t') }}\nEnquiry: {{ $('Get Form Values').item.json.enquiry.trim() }}\n",
+        "options": {
+          "formTitle": "Appointment Request Sent!"
+        }
+      },
+      "id": "9e0b844b-dac5-4aeb-8fab-6ea26d41ece9",
+      "name": "Form End",
+      "type": "n8n-nodes-base.form",
+      "position": [
+        944,
+        0
+      ],
+      "webhookId": "8fcc907b-bc2e-4fdf-a829-82c83e677724",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "defineForm": "json",
+        "jsonOutput": "={{\n[\n {\n \"fieldLabel\":\"Date\",\n \"requiredField\":true,\n \"fieldType\": \"dropdown\",\n \"fieldOptions\":\n Array(5).fill(0)\n .map((_,idx) => $now.plus(idx+1, 'day'))\n .filter(d => !d.isWeekend)\n .map(d => ({ option: d.format('EEE, d MMM') }))\n },\n {\n \"fieldLabel\": \"Time\",\n \"requiredField\": true,\n \"fieldType\": \"dropdown\",\n \"fieldOptions\": [\n { \"option\": \"9:00 am\" },\n { \"option\": \"10:00 am\" },\n { \"option\": \"11:00 am\" },\n { \"option\": \"12:00 pm\" },\n { \"option\": \"1:00 pm\" },\n { \"option\": \"2:00 pm\" },\n { \"option\": \"3:00 pm\" },\n { \"option\": \"4:00 pm\" },\n { \"option\": \"5:00 pm\" },\n { \"option\": \"6:00 pm\" }\n ]\n }\n]\n}}",
+        "options": {
+          "formTitle": "Enter a Date & Time",
+          "formDescription": "=Please select a date and time"
+        }
+      },
+      "id": "17c290cf-e61a-4195-a43c-a631de2b25a3",
+      "name": "Enter Date & Time",
+      "type": "n8n-nodes-base.form",
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "0cd03415-66f8-4c82-8069-5bfd8ea310bd",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{\n{\n name: $('n8n Form Trigger').first().json['Your Name'],\n email: $('n8n Form Trigger').first().json.Email,\n enquiry: $('n8n Form Trigger').first().json.Enquiry,\n dateTime: DateTime.fromFormat(`${$json.Date} ${$json.Time}`, \"EEE, dd MMM t\"),\n submittedAt: $('n8n Form Trigger').first().json.submittedAt,\n}\n}}",
+        "options": {}
+      },
+      "id": "433088ee-7be3-4603-bd2e-1407be54eb5f",
+      "name": "Get Form Values",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        224,
+        0
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Please select",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "I accept the terms and conditions"
+                  }
+                ]
+              },
+              "multiselect": true,
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "formTitle": "Before we continue...",
+          "formDescription": "=Terms and Conditions for Booking an Appointment\n\nNon-Binding Nature of Discussions:\nAny information shared, discussed, or agreed upon during the call is non-binding and provisional. No agreement, service, or commitment shall be considered confirmed unless explicitly documented and agreed to in writing.\n\nProhibition of Recording and Note-Taking Tools:\nBy proceeding with the appointment, the user agrees not to use AI assistants, note-taking applications, recording devices, or any other technology to record or transcribe the conversation, whether manually or automatically. This is to ensure confidentiality and respect for the integrity of the discussion.\n\nConfirmation of Understanding:\nBy booking this appointment, you acknowledge and accept these terms and conditions in full."
+        }
+      },
+      "id": "17a24927-4ef9-4fa1-80c8-6527ee19d1eb",
+      "name": "Terms & Conditions",
+      "type": "n8n-nodes-base.form",
+      "position": [
+        -448,
+        112
+      ],
+      "webhookId": "dcf32f99-8fb7-457a-8a58-ac1a018b1873",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "c08aadad-e21e-4238-b837-fb948e3827b9",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -720,
+        320
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "nZKXPr9EcYPRZwCs",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "bc7c3e99-e610-4997-82a7-4851f2c04c19",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              },
+              "leftValue": "={{ $json['Please select'][0] }}",
+              "rightValue": "I accept"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e2cefc9c-706d-4942-9697-f76dc8a45ee8",
+      "name": "Has Accepted?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -224,
+        112
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Get Form Values').first().json.email }}",
+        "subject": "=Appointment Request Received for {{ DateTime.fromISO($('Get Form Values').first().json.dateTime).format('EEE, dd MMM @ t') }}",
+        "message": "=<p>Dear {{ $('Get Form Values').first().json.name }},</p>\n<p>Thanks for requesting an appointment. We will review and get back to you shortly.</p>\n<p>Here is the summary of the request that was sent:</p>\n<p>\nName: {{ $('Get Form Values').first().json.name }}<br/>\nEmail: {{ $('Get Form Values').first().json.email }}<br/>\nEnquiry: {{ $('Get Form Values').first().json.enquiry }}<br/>\nSubmitted at: {{ $('Get Form Values').first().json.submittedAt }}\n</p>\n",
+        "options": {}
+      },
+      "id": "c08f6da7-3d9a-45b6-ba41-bf1474e71e48",
+      "name": "Send Receipt",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        720,
+        0
+      ],
+      "webhookId": "5f590407-4ab9-4ae6-bb85-38dbe41d6dce",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V95KRVgM4r2SewcV",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Send me a DM Instead!",
+        "completionMessage": "Thanks for your enquiry but it may not necessarily need an appointment. Please feel free to email me instead at jim@example.com.",
+        "options": {}
+      },
+      "id": "116a0c2c-f154-44d8-bf20-9113688aea4a",
+      "name": "Decline",
+      "type": "n8n-nodes-base.form",
+      "position": [
+        -448,
+        304
+      ],
+      "webhookId": "4353eadb-b7a0-45f2-8dd8-5f6cd882d8d8",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Send me a DM Instead!",
+        "completionMessage": "Thanks for your enquiry but it may not necessarily need an appointment. Please feel free to email me instead at jim@example.com.",
+        "options": {}
+      },
+      "id": "7b10ed18-d7ea-4ab3-93ad-c590bac2caa3",
+      "name": "Decline1",
+      "type": "n8n-nodes-base.form",
+      "position": [
+        0,
+        208
+      ],
+      "webhookId": "4353eadb-b7a0-45f2-8dd8-5f6cd882d8d8",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.Enquiry }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "relevant enquiry",
+              "description": "Enquire about AI, automation, digital products and product engineering."
+            }
+          ]
+        },
+        "options": {
+          "fallback": "other"
+        }
+      },
+      "id": "d2eb0aa7-3d29-400b-9bfc-da3242430ac2",
+      "name": "Enquiry Classifier",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "position": [
+        -800,
+        112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "=aditya995148@gmail.com",
+        "subject": "New Appointment Request!",
+        "message": "=<h2>A new appointment request was submitted!</h2>\n<p>\nRequesting appointment date is <strong>{{ $('Get Form Values').item.json.dateTime.toDateTime(IST)}}\n</strong>.\n</p>\n<p>\nName: {{ $('Get Form Values').item.json.name }}<br/>\nEmail:{{ $('Get Form Values').item.json.email }} <br/>\nEnquiry Summary: {{ $json.text }}<br/>\nSubmitted at: {{ $('Get Form Values').item.json.submittedAt }}\n</p>",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "approveLabel": "Confirm"
+          }
+        },
+        "options": {}
+      },
+      "id": "91352082-3012-404b-bb87-384d523b3a6c",
+      "name": "Wait for Approval",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        768,
+        224
+      ],
+      "webhookId": "ab9c6c5e-334d-44bb-a8fd-a58140bc680d",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V95KRVgM4r2SewcV",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "e5e37acb-9e9d-4a9e-bf59-a35dfc035886",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "00940008-eef0-4520-8a94-13ec89d74c69",
+      "name": "Has Approval?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        992,
+        224
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "153bfa30-b9c0-45ca-b127-f46f50047f98",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        432,
+        432
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "nZKXPr9EcYPRZwCs",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "azcreation84@gmail.com",
+          "mode": "list",
+          "cachedResultName": "azcreation84@gmail.com"
+        },
+        "start": "={{ $('Get Form Values').item.json.dateTime}}",
+        "end": "={{ $('Get Form Values').item.json.dateTime }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $('Get Form Values').item.json.email }}"
+          ],
+          "conferenceDataUi": {
+            "conferenceDataValues": {
+              "conferenceSolution": "hangoutsMeet"
+            }
+          },
+          "description": "={{ $('Summarise Enquiry').first().json.text }}\n\nOriginal message:\n> {{ $('Get Form Values').item.json.enquiry }}",
+          "summary": "=Appointment Scheduled -{{ $('Get Form Values').item.json.name }}  & Aditya"
+        }
+      },
+      "id": "eaca1634-6a70-4a3c-b302-3164004c314c",
+      "name": "Create Appointment",
+      "type": "n8n-nodes-base.googleCalendar",
+      "position": [
+        1248,
+        224
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "vQ85aeprOiGc0Lk3",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Execute Workflow Trigger').first().json.email }}",
+        "subject": "=Appointment Request Rejected for {{ DateTime.fromISO($('Execute Workflow Trigger').first().json.dateTime).format('EEE, dd MMM @ t') }}",
+        "message": "=<p>Dear {{ $('Execute Workflow Trigger').first().json.name }},</p>\n<p>Unfortunately, we cannot schedule the requested appointment at the requested time.</p>\n<p>Kind regards</p>\n",
+        "options": {}
+      },
+      "id": "d35a3c6f-fc34-4b89-90cf-49743e899621",
+      "name": "Send Rejection",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1248,
+        432
+      ],
+      "webhookId": "5f590407-4ab9-4ae6-bb85-38dbe41d6dce",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "V95KRVgM4r2SewcV",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=The enquiry is as follows:\n{{ $json.enquiry }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Summarise the given enquiry"
+            }
+          ]
+        }
+      },
+      "id": "24ad1c48-ec15-4c69-a5f3-0940086589c7",
+      "name": "Summarise Enquiry",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        400,
+        224
+      ],
+      "typeVersion": 1.5
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        0
+      ],
+      "id": "549bafd5-8fea-47d7-9d95-f91bb88e2985",
+      "name": "Wait",
+      "webhookId": "040cc00d-32be-419a-a420-8672f54f4a63"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Send Receipt": {
+      "main": [
+        [
+          {
+            "node": "Form End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Accepted?": {
+      "main": [
+        [
+          {
+            "node": "Enter Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Decline1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Form Values": {
+      "main": [
+        [
+          {
+            "node": "Summarise Enquiry",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "n8n Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "Enquiry Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enter Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Get Form Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Enquiry Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enquiry Classifier": {
+      "main": [
+        [
+          {
+            "node": "Terms & Conditions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Decline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Terms & Conditions": {
+      "main": [
+        [
+          {
+            "node": "Has Accepted?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Approval": {
+      "main": [
+        [
+          {
+            "node": "Has Approval?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Approval?": {
+      "main": [
+        [
+          {
+            "node": "Create Appointment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Rejection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarise Enquiry",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarise Enquiry": {
+      "main": [
+        [
+          {
+            "node": "Wait for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Send Receipt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "1ccf0150-ab35-4a23-92dd-7bd0a052dfa0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dfd570963f66daa8de8ab1ade05392186cc69eddd54632309bd587c2faeb7e2b"
+  },
+  "id": "nAeO54w7PRWgKMZ1",
+  "tags": []
+}

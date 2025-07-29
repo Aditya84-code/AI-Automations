@@ -1,0 +1,515 @@
+{
+  "name": "Smart Invoice Followup",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1516ff5d-2b9d-4e28-8640-e945f277a3b3",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Vw-6e5_M3HUWUQ3_wWbsRFUI8H46Lou3GlqbfMbRkW8",
+          "mode": "list",
+          "cachedResultName": "Invoice follow up",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Vw-6e5_M3HUWUQ3_wWbsRFUI8H46Lou3GlqbfMbRkW8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Vw-6e5_M3HUWUQ3_wWbsRFUI8H46Lou3GlqbfMbRkW8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        220,
+        0
+      ],
+      "id": "1542dc5f-fccc-40b1-8124-c6476d996dff",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aMDwBXOAlaeayRdi",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "743787ff-178f-4f31-818d-29eb487f1821",
+              "name": "daysSinceSent",
+              "value": "={{ $now.diffTo($json['Date Sent'], 'days').round()}}",
+              "type": "number"
+            },
+            {
+              "id": "383f5802-44e0-403f-8341-11ba21ff5b32",
+              "name": "email",
+              "value": "={{ $json.Email }}",
+              "type": "string"
+            },
+            {
+              "id": "f6c4223f-daaf-4a46-902a-ea0c502c1d3a",
+              "name": "firstName",
+              "value": "={{ $json['Client Name'].split(\" \")[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        0
+      ],
+      "id": "aa7cda17-339b-4baa-9d94-5fc81895aaf6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8c3de0df-40ad-418b-aad6-65c9aecf1927",
+              "leftValue": "={{ $json.daysSinceSent }}",
+              "rightValue": 17,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "5172965c-6673-45a7-b0de-d832eb6b310b",
+              "leftValue": "={{ $json.daysSinceSent }}",
+              "rightValue": 14,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "bd3d3bdc-4331-4e04-b917-c529f7a8d85f",
+              "leftValue": "={{ $json.daysSinceSent }}",
+              "rightValue": 21,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "d6f59d99-741c-4aa2-bbce-73e37f9dcf2c",
+              "leftValue": "={{ $json.daysSinceSent }}",
+              "rightValue": 28,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "06bf40a7-23c3-484c-a76e-209a1ab57aeb",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        880,
+        0
+      ],
+      "id": "5c7506dc-8dfc-45fe-a62f-0d11fdf76998",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 10,
+        "simple": false,
+        "filters": {
+          "q": "=from: {{ $json.email }} OR to:{{ $json.email }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1100,
+        -60
+      ],
+      "id": "82b413c5-5ba2-4592-a652-1ecf8b3eb6fe",
+      "name": "Gmail",
+      "webhookId": "e6e7238d-1068-444a-8d5d-4546dd59ed7f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "MtJfrJPcN1TZuBjL",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "text"
+            },
+            {
+              "fieldToAggregate": "headers.date"
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": true
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1300,
+        -60
+      ],
+      "id": "6b7b72c1-3833-4b80-ba2b-f1ce0dcc9207",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=I am following up overdue invoices by sending a series of templated emails. Your task is to read through the conversation history between me and the prospect and determine whether I can send the email as it is or if there are some changes i need to make in the template \n\nHere is the template:\n\nHey {{ $('Filter').item.json.firstName }},\n\nHope you're well, Just checking in on that invoice I sent you earlier. Let me know if you need anything.\n\nThanks,\nAditya\n\nYou'll return you answer in json format properly with each key with their value in a single array like this\n{\"verdict\":True or false,\n\"emailTemplate\":\"modified email templated with \\n in place of newlines\"}\n\nRules:\n-if we sent an email discussing the invoice in the last 72 hours, do not follow up. This would be annoying. if this occurs just skip and return \"False\" for the \"verdict\"\n-if we did not send an email discussing the invoice in the last 72 hours, return \"True\" for the \"verdict\"\n-if we've discussed something that materially makes the followup strange (i.e. repeating the same info, or say something out of context), modify the temlate to accomodate for this. Do not modify the template unless it's necessary to maintain a cohesive conversation \n\nCurrent time: {{ $now }}\n\nConversation History:\n{{ $json.textwithdate }}",
+        "options": {
+          "systemMessage": "You are a helpful intelligent administrative assistant. You help me follow up with emails"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1740,
+        -60
+      ],
+      "id": "ee1b6e3a-4ed8-4db9-b9fd-0156d8c79694",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1740,
+        200
+      ],
+      "id": "43dcbad0-b6cc-430b-a360-2c77a7b0be4b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wiX13pBaT5cGc9YS",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d292beb4-bb6b-4ed5-a71e-5530a5c494b2",
+              "name": "textwithdate",
+              "value": "={{ $json.text.map((item, index) => $json.date[index] + \"\\n\" + item) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1520,
+        -60
+      ],
+      "id": "abbf6a8a-fced-4276-9c6c-98bdea781347",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "instructions": "Split out each value with their key in json format from the output",
+        "codeGeneratedForPrompt": "Split out each value with their key in json format from the output",
+        "jsCode": "const items = $input.all();\nconst updatedItems = items.map((item) => {\n  const output = JSON.parse(item?.json?.output);\n  return { ...item?.json, output };\n});\nreturn updatedItems;\n"
+      },
+      "type": "n8n-nodes-base.aiTransform",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        -60
+      ],
+      "id": "9ff9e56c-11c4-4bb6-95f1-dd9af125ed0c",
+      "name": "AI Transform"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ed638a9e-0666-4d29-bea9-4b74eb4d437e",
+              "leftValue": "={{ $json.output.verdict }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "61829f92-7871-49cf-bd4e-88a3d7ae2c35",
+              "leftValue": "={{ $json.output.verdict }}",
+              "rightValue": "True",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        2380,
+        -60
+      ],
+      "id": "377559ee-23c3-4160-aa0c-7ce8233bc387",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "=Re: Invoice for  {{ $('Filter').item.json.firstName }}",
+        "message": "={{ $json.output.emailTemplate }}",
+        "options": {
+          "sendTo": "={{ $('Filter').item.json.email }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2600,
+        0
+      ],
+      "id": "281343c7-1b6c-4910-b362-523653ff3c10",
+      "name": "Gmail1",
+      "webhookId": "5f34c909-ce2a-4ee8-b68a-fdd8608e12c7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "MtJfrJPcN1TZuBjL",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Transform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Transform": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9b93c6bc-c671-42ec-87e6-4b21e40645bb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6e339f61095fe8ebf8d14b69dc87593ea5879729d658b948550957eac39461e0"
+  },
+  "id": "5PmQ7tPH13MbYhH0",
+  "tags": []
+}

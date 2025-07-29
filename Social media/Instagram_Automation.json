@@ -1,0 +1,400 @@
+{
+  "name": "Instagram Automation",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "71de4ad6-c000-4111-8181-56dc287ee6a9",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aa136567-d140-4f3e-b68e-09c220e023c6",
+              "name": "Reel",
+              "value": "={{ $json.Reel }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        0
+      ],
+      "id": "d4fdbbc9-b063-49c5-ab74-4477f31b28e0",
+      "name": "Reel link"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://instagram-video-transcript.p.rapidapi.com/transcribe-ig-video",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rapidapi-host",
+              "value": "instagram-video-transcript.p.rapidapi.com"
+            },
+            {
+              "name": "x-rapidapi-key",
+              "value": "ae230d477bmsh7b8bf63244ecc79p1a1651jsn7913d4507506"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.Reel }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "9109f276-1727-4978-a9e3-fedeedd925b4",
+      "name": "Trasnscript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f37c68b2-a414-446a-af97-da247b24e268",
+              "name": "Script",
+              "value": "={{ $json.response.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        0
+      ],
+      "id": "5a225a6e-10ab-4bef-b9f4-52063ea3462d",
+      "name": "Script"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "18U9iIKxtSyAc68MNgd5K5O1gPUQ_R6T-vIJjm3ucOuc",
+          "mode": "list",
+          "cachedResultName": "Instagram Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18U9iIKxtSyAc68MNgd5K5O1gPUQ_R6T-vIJjm3ucOuc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18U9iIKxtSyAc68MNgd5K5O1gPUQ_R6T-vIJjm3ucOuc/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Pending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        220,
+        0
+      ],
+      "id": "4f8511d6-89af-4159-bbfa-2c449227f5de",
+      "name": "Get data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "243YsPnUeyIDuvUx",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Script }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=YOU ARE AGENT: THE WORLD’S LEADING EXPERT IN INSTAGRAM REELS DESCRIPTIONS, HOOKS & HASHTAGS\nGlobally recognized for writing scroll-stopping, algorithm-friendly Instagram Reel captions and hashtag strategies, your job is to turn summarized transcripts or video content into short, punchy descriptions that grab attention fast, drive engagement (likes, comments, shares), and enhance discoverability through trending keywords and hashtags.\n\n✅ INSTRUCTIONS\n1. Lead with a bold hook or emotional statement (1–2 lines) — this is what users see before clicking “more.”\n2. Summarize the reel in a natural, exciting tone — use simple, relatable language.\n3. Include strong CTAs like “Comment your thoughts,” “Tag someone,” or “Save this for later.”\n4. Keep it short & mobile-optimized — avoid bulky text.\n\n📦 FORMAT\nCaption (main body):\n\n1–2 sentence hook\n\n3–5 sentence summary of the reel\n\n1–2 sentence engagement CTA\n\n📌 Tags:\n\nSEO Meta Tags: comma-separated keywords relevant to the content\n\nHashtags: Instagram-optimized, niche-specific (up to 15)\n\n🧠 CHAIN OF THOUGHTS\nANALYZE THE VIDEO TRANSCRIPT OR SUMMARY:\n\nUnderstand the reel’s main theme, tone, and viewer takeaway\n\nIdentify strong keywords, emotions, or reactions it might spark\n\nSpot viral or trending content patterns\n\nCRAFT A CAPTION:\n\nStart with a hook that grabs attention in the first 1–2 lines\n\nSummarize the value clearly (funny, educational, inspiring, etc.)\n\nAdd CTAs like “What do you think?” or “Double-tap if you agree!”\n\nOPTIMIZE FOR IG SEARCH & REACH:\n\nAdd relevant keywords to a “SEO Tags” block\n\nChoose niche hashtags: blend broad (#motivation) and specific (#uxhumor)\n\n❌ WHAT NOT TO DO\nDon’t start with “This reel is about…” — make it dynamic\n\nDon’t overstuff hashtags or use banned ones\n\nDon’t skip CTAs — Reels are made to spark interaction\n\nDon’t write long blocks of text — users scroll fast\n\n💡 EXAMPLE\n📄 Output Instagram Reel Caption:\nFeel like you're working all day but getting nothing done? Try this 🔥\n\nThis 25-minute productivity trick will change how you work — forever.\nWatch how a simple Chrome extension + Pomodoro = laser focus.\nSwipe to see the ‘before vs. after’ difference 👀\n\n💬 Tried it before? Comment your results!\n🔖 Save this reel for your next study/work sprint.\n\n📌 SEO Tags:\npomodoro technique, productivity tips, chrome extension, time management, study hacks, work from home tips\n\n#️⃣ Hashtags:\n#ProductivityHacks #PomodoroMethod #WorkSmarter #StudyTips #FocusTools #TimeBlocking #MotivationDaily #RemoteWorkLife #MindfulWorking"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "f82e816a-3823-4df0-9bd4-06a2caba1b6d",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1060,
+        220
+      ],
+      "id": "24d82ca9-49be-4ba0-a0d7-a4d908417089",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "qvfx2xNcG6Yi66ea",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      caption: \"\",\n      seo_tags: \"\",\n      hashtags: \"\"\n    }\n  }\n].map(item => {\n  const input = $json[\"text\"] || \"\";\n\n  // Clean the text: remove all \\n\n  const cleaned = input.replace(/\\\\n/g, ' ').trim();\n\n  // Extract caption, SEO tags, and hashtags\n  const seoStart = cleaned.indexOf(\"SEO Tags:\");\n  const hashStart = cleaned.indexOf(\"Hashtags:\");\n\n  item.json.caption = cleaned.substring(0, seoStart).trim();\n  item.json.seo_tags = cleaned.substring(seoStart + 9, hashStart).trim();\n  item.json.hashtags = cleaned.substring(hashStart + 9).trim();\n\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1460,
+        0
+      ],
+      "id": "c9c5628c-15bd-4ba5-8737-4bf32aee5a6b",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "18U9iIKxtSyAc68MNgd5K5O1gPUQ_R6T-vIJjm3ucOuc",
+          "mode": "list",
+          "cachedResultName": "Instagram Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18U9iIKxtSyAc68MNgd5K5O1gPUQ_R6T-vIJjm3ucOuc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18U9iIKxtSyAc68MNgd5K5O1gPUQ_R6T-vIJjm3ucOuc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Reel": "={{ $('Reel link').item.json.Reel }}",
+            "Status": "Done",
+            "Caption": "={{ $json.caption }}",
+            "Tags": "={{ $json.hashtags }}"
+          },
+          "matchingColumns": [
+            "Status"
+          ],
+          "schema": [
+            {
+              "id": "Reel",
+              "displayName": "Reel",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Caption",
+              "displayName": "Caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tags",
+              "displayName": "Tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1680,
+        0
+      ],
+      "id": "531ac9bf-3ccb-4b37-ab41-e3d09225e7e1",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "243YsPnUeyIDuvUx",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reel link": {
+      "main": [
+        [
+          {
+            "node": "Trasnscript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trasnscript": {
+      "main": [
+        [
+          {
+            "node": "Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get data": {
+      "main": [
+        [
+          {
+            "node": "Reel link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Script": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f3a5725d-a889-4775-a695-ca077c794af5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "eb83834bf2d5f2cc756f791e3f67ff578e00f68a37e482d5e071f82dc8a712d4"
+  },
+  "id": "V1CWgiCx9wNxMORo",
+  "tags": []
+}

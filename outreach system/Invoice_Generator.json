@@ -1,0 +1,190 @@
+{
+  "name": "Invoice Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f7fc1636-806c-4f7a-b462-fbfdc4e80fce",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        0
+      ],
+      "id": "42e214d9-9edc-48f7-8bea-ec2e0f481ae0",
+      "name": "Webhook",
+      "webhookId": "f7fc1636-806c-4f7a-b462-fbfdc4e80fce"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Invoice</title>\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <style>\n    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; background: #fff; color: #222;}\n    .invoice-container { max-width: 700px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); padding: 40px 40px 30px 40px; position: relative; overflow: hidden;}\n    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;}\n    .logo { width: 90px; height: 90px; object-fit: contain;}\n    .invoice-title { font-size: 2.6rem; font-weight: 800; letter-spacing: -2px; margin: 0 0 10px 0;}\n    .invoice-no { font-size: 1rem; color: #888; text-align: right; margin-top: 10px;}\n    .info-section { display: flex; justify-content: space-between; margin-bottom: 30px;}\n    .info-block { font-size: 1rem; line-height: 1.5;}\n    .info-block strong { display: block; margin-bottom: 3px; font-weight: 700;}\n    .invoice-details { margin-bottom: 30px; font-size: 1rem;}\n    .invoice-details span { display: inline-block; margin-right: 25px;}\n    table { width: 100%; border-collapse: collapse; margin-bottom: 20px;}\n    th, td { padding: 12px 8px; text-align: left;}\n    th { background: #f2f2f2; font-weight: 700; font-size: 1rem; border-bottom: 2px solid #e0e0e0;}\n    td { border-bottom: 1px solid #f0f0f0; font-size: 1rem;}\n    .totals { margin-top: 10px; float: right; width: 300px;}\n    .totals td { border: none; padding: 6px 8px;}\n    .totals .label { text-align: right; color: #555;}\n    .totals .amount { text-align: right; font-weight: 700;}\n    .totals .total-row { font-size: 1.2rem; border-top: 2px solid #222;}\n    .footer { margin-top: 40px; font-size: 1rem; color: #666;}\n    .footer strong { color: #222;}\n    .wave-bg { position: absolute; bottom: -70px; left: -60px; width: 900px; height: 200px; z-index: 0; pointer-events: none; opacity: 0.13;}\n  </style>\n</head>\n<body>\n  <div class=\"invoice-container\">\n    <div class=\"header\">\n      <img src=\"{{ $json.body.businessInfo.logoPreview }}\" alt=\"Logo\" class=\"logo\">\n      <div>\n        <div class=\"invoice-title\">INVOICE</div>\n        <div class=\"invoice-no\">No.{{ $json.body.invoiceDetails.invoiceNumber }} </div>\n      </div>\n    </div>\n\n    <div class=\"info-section\">\n      <div class=\"info-block\">\n        <strong>Billed To:</strong>\n        <div>ID: {{ $json.body.customerInfo.customerId }}</div>\n        <div>Name: {{ $json.body.customerInfo.fullName }}</div>\n        <div>Email: {{ $json.body.customerInfo.email }}</div>\n        <div>Company: {{ $json.body.customerInfo.companyName }} </div>\n      </div>\n      <div class=\"info-block\">\n        <strong>From:</strong>\n        <div>{{ $json.body.businessInfo.businessName }}</div>\n        <div>{{ $json.body.businessInfo.contactInformation }}</div>\n      </div>\n    </div>\n\n    <div class=\"invoice-details\">\n      <span><strong>Invoice ID:</strong>{{ $json.body.invoiceDetails.invoiceNumber }}</span>\n      <span><strong>Due Date:</strong>{{ $json.body.invoiceDetails.dueDate }}</span>\n      <span><strong>Terms:</strong>{{ $json.body.invoiceDetails.paymentTerms }} </span>\n      <span><strong>Currency:</strong>{{ $json.body.invoiceDetails.currency }}</span>\n    </div>\n\n    <table>\n      <thead>\n        <tr>\n          <th>Description</th>\n          <th>Quantity</th>\n          <th>Unit Price</th>\n          <th>Amount</th>\n        </tr>\n      </thead>\n      <tbody>\n   {{ $json.tableRows }}\n      </tbody>\n    </table>\n\n    <table class=\"totals\">\n      <tr>\n        <td class=\"label\">Subtotal</td>\n        <td class=\"amount\">{{ $json.subtotal }}{{ $json.body.invoiceDetails.currency }}</td>\n      </tr>\n      <tr>\n        <td class=\"label\">{{ $json.body.invoiceDetails.taxRate }}%</td>\n        <td class=\"amount\">{{ $json.tax }}</td>\n      </tr>\n      <tr class=\"total-row\">\n        <td class=\"label\"><strong>Total</strong></td>\n        <td class=\"amount\"><strong>{{ $json.body.invoiceDetails.amount }}{{ $json.body.invoiceDetails.currency }}</strong></td>\n      </tr>\n    </table>\n    <div style=\"clear: both;\"></div>\n\n    <div class=\"footer\">\n      <strong>Business Name:</strong>{{ $json.body.businessInfo.businessName }}<br>\n      <strong>Business Info:</strong>{{ $json.body.businessInfo.contactInformation }}<br>\n      <br>\n      <strong>Note:</strong> Thank you for your business!\n    </div>\n\n    <!-- Decorative background -->\n    <svg class=\"wave-bg\" viewBox=\"0 0 900 200\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n      <ellipse cx=\"300\" cy=\"200\" rx=\"300\" ry=\"100\" fill=\"#222\"/>\n      <ellipse cx=\"700\" cy=\"180\" rx=\"250\" ry=\"80\" fill=\"#888\"/>\n    </svg>\n</body>\n</html>\n"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        360,
+        0
+      ],
+      "id": "0737469a-1aa9-4f2f-bdec-f2bd2a8bbba5",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pdfshift.io/v3/convert/pdf",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "sk_5e48328d0101fbb2b618c9f708637b9f93efca50"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "source",
+              "value": "={{ $json.html }}"
+            },
+            {
+              "name": "landscape",
+              "value": "false"
+            },
+            {
+              "name": "use_print",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "wikipedia.pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        600,
+        0
+      ],
+      "id": "77ffe542-bb17-42dd-8179-c02da6ebaf8b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.first().json.body.invoiceDetails.items ;\n\nlet tableRows = '';\nlet subtotal = 0;\nconst taxRate = $input.first().json.body.invoiceDetails.taxRate*0.01\n\nfor (const item of items) {\n  subtotal += Number(item.quantity) * Number(item.unitPrice);\n  tableRows += `\n    <tr>\n      <td>${item.description}</td>\n      <td>${item.quantity}</td>\n      <td>${item.unitPrice.toFixed(2)}</td>\n      <td>${item.amount.toFixed(2)}</td>\n    </tr>\n  `;\n}\n\nconst tax = subtotal * taxRate;\n\nreturn [{ json: { ...$json, tableRows, subtotal: subtotal.toFixed(2),  tax: tax.toFixed(2), } }]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        120,
+        0
+      ],
+      "id": "f601f043-338f-4eff-ab85-218ca0bd14dc",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.customerInfo.email }}",
+        "subject": "Invoice Generated",
+        "emailType": "text",
+        "message": "=Your Invoice has been generated with invoice no. {{ $('Webhook').item.json.body.invoiceDetails.invoiceNumber }}.",
+        "options": {
+          "appendAttribution": false,
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "wikipedia.pdf"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        820,
+        0
+      ],
+      "id": "b34fdf40-2c7e-46ae-810b-ea7fc731279b",
+      "name": "Gmail",
+      "webhookId": "8929c20d-6bd8-4b17-90cb-b4ff344124ab",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Xzx7GWiw0BEc6dgm",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2c13360b-1464-44b6-bed7-9b37bff274e3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cf29f5c329779214aff83ac400d0f45388921b6d6e0fb0948a13e2947d17ac80"
+  },
+  "id": "vbwffKss5CgeRWX0",
+  "tags": []
+}

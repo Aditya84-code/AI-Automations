@@ -1,0 +1,281 @@
+{
+  "name": "LinkedIn Content Creator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -40
+      ],
+      "id": "1f81b164-fe03-40d2-a07b-48cf1e600225",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "10l-9ZPQEkN_MxGsAPSzTX1avr53iJ3wa2UNixuThgnk",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10l-9ZPQEkN_MxGsAPSzTX1avr53iJ3wa2UNixuThgnk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10l-9ZPQEkN_MxGsAPSzTX1avr53iJ3wa2UNixuThgnk/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Todo"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -100,
+        -40
+      ],
+      "id": "de0f4d83-5158-4391-ad6c-f1119c65d567",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gyKDANl2pXAzlMha",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"search the web for {{ $json.Topic }}\",\n  \"topic\": \"general\",\n  \"search_depth\": \"basic\",\n  \"chunks_per_source\": 3,\n  \"max_results\": 3,\n  \"time_range\": null,\n  \"days\": 7,\n  \"include_answer\": true,\n  \"include_raw_content\": false,\n  \"include_images\": false,\n  \"include_image_descriptions\": false,\n  \"include_domains\": [],\n  \"exclude_domains\": []\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        120,
+        -40
+      ],
+      "id": "ee04bf4a-a7e7-4bd1-aae6-8751dab7f95d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Article 1:{{ $json.results[0].content }}\nArticle 2:{{ $json.results[1].content }}\nArticle 3:{{ $json.results[2].content }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=## Role:\nYou are a skilled content strategist and social media writer, specialized in crafting LinkedIn posts from multiple sources. Your job is to read three articles, extract the core insights, and write a single, concise LinkedIn post that combines the key takeaways in a clear, engaging, and conversational tone.\n\n## Instructions:\nInput: You will receive three articles. These may vary in length and topic, but are generally centered around a common industry, trend, or theme.Strictly follow the output as given in the example output\n\nGoal: Create one cohesive LinkedIn post that:\n\nSynthesizes the core ideas from all three articles.\n\nFeels natural and friendly, as if written by a professional sharing insights with their network.\n\nIs structured with a strong hook (first line) to grab attention.\n\nUses clear, jargon-free language unless technical terms are essential.\n\nEnds with a light call to action, thought-provoking question, or invitation for discussion if appropriate.\n\nTone: Conversational, insightful, and confident — like a knowledgeable peer sharing a summary or perspective.\n\nLength: Between 400 and 800 characters. Aim for clarity and punchiness over fluff.\n\nNo direct quotes unless they are short, powerful, and properly contextualized. Focus on summarizing and synthesizing.\n\nFormatting:\n\nUse line breaks for readability.\n\nNo hashtags or emojis unless highly relevant.\n\n## Output Format:\nReturn only the LinkedIn post in plain text. Do not mention that the post was generated from articles. Write it as if the poster read the articles and is sharing their reflections.\n\n## Example Output:\nHook:\nWhat if the future of work isn’t remote or hybrid — but intentional?\n\nPost:\nThree recent pieces paint a fascinating picture: leaders are shifting from where people work to how they work best. Flexibility isn’t just about location; it’s about autonomy, outcomes, and trust.\n\nWhat stood out most was the emphasis on designing workflows that empower focus — not just availability. Maybe it’s time we rethink productivity metrics altogether.\n\nHow are you seeing this play out in your teams?\n\nP.S - Which one you choose?"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        320,
+        -40
+      ],
+      "id": "ae04a022-bc95-4238-8c17-46fee7512545",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-preview-04-17-thinking",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        180
+      ],
+      "id": "1ac7c4ca-ff1e-42be-b893-b22b74595798",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "p96HFdy4rLlhGv26",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "10l-9ZPQEkN_MxGsAPSzTX1avr53iJ3wa2UNixuThgnk",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10l-9ZPQEkN_MxGsAPSzTX1avr53iJ3wa2UNixuThgnk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10l-9ZPQEkN_MxGsAPSzTX1avr53iJ3wa2UNixuThgnk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Topic": "={{ $('Google Sheets').item.json.Topic }}",
+            "Status": "Done",
+            "Content": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "Topic"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        680,
+        -40
+      ],
+      "id": "d03ec6f1-b6c0-4957-99de-56ddb8c81ca8",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gyKDANl2pXAzlMha",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "60f19185-c794-4226-b478-18a4a91f68d6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cf29f5c329779214aff83ac400d0f45388921b6d6e0fb0948a13e2947d17ac80"
+  },
+  "id": "RswOkmrVv3stzkNY",
+  "tags": []
+}
