@@ -1,0 +1,433 @@
+{
+  "name": "Restaurant System",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "9eac2335-024b-4c34-9e0a-03d6f2602da6",
+      "name": "Wait For Response",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        304,
+        400
+      ],
+      "webhookId": "d9c5d69c-2dfa-4b9f-89f5-76f25d0dd241",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}\n\nDon't use *\nGive this details separately\nCustomer name\nCustomer phone number\nNo. of guests\nAny special request\ndate and time they want to book",
+        "options": {
+          "systemMessage": "=You are a helpful and friendly for a restaurant named \"AROMA\".\n\nWhen a customer sends a message, greet them politely and provide clear, short replies to their questions about:\n\nRestaurant timings (opening/closing hours)\nTable booking or reservation availability\nMenu items (food types, popular dishes, specials)\nRestaurant location or directions\nServices offered (dine-in, takeaway, delivery)\nPricing and current offers\nConfirming or cancelling a reservation\n\nIf the customer asks something unrelated to the restaurant, reply:\n🟢“I’m here to help with restaurant-related questions. Would you like to know our timings, menu, or book a table?”\n\nIf a message is unclear or incomplete, respond with:\n🟢“Could you please clarify your question so I can assist you better?”\n\nAlways keep the conversation short, polite, and informative.\n\nIf customer query is related to table booking then you must take the following information from customer\n\nCustomer name\nCustomer phone number\nNo. of guests\nAny special request\ndate and time they want to book\n\nkeep the track the of date and time with current time\ncurrent time:{{ $now }}\n\nDon't use ** or * or any special charcater in reply\n\n"
+        }
+      },
+      "id": "bd2f5c62-0fcc-4c11-8878-9dcb9d86980a",
+      "name": "Extract Customer Query",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -80,
+        400
+      ],
+      "typeVersion": 1.9
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "16189d6d-a282-4181-9242-ffc6eb1b4d06",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "Customer name",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "b28bca5a-6268-47ae-9c1f-8ff8be7fd2ca",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "Customer phone number",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "40c9f699-f697-4bf5-9386-dbe1ed99071b",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "No. of guests",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "6118a32b-796e-4b29-8975-afb1f5605c76",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "Date and time",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "82b1aaa8-edff-4769-8b97-8bddcad80ebd",
+      "name": "Check If Table Booking Required",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        560,
+        400
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "table_bookings",
+          "mode": "list",
+          "cachedResultName": "table_bookings"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "number_of_guests": "={{ $json.guests }}",
+            "customer_name": "={{ $json.customerName }}",
+            "customer_phone": "={{ $json.phoneNumber }}",
+            "booking_date": "={{ $json.date }}",
+            "special_requests": "={{ $json.specialRequest }}",
+            "booking_time": "={{ $json.time }}",
+            "booking_id": "={{ $('Telegram Trigger').item.json.message.message_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "booking_id",
+              "displayName": "booking_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_phone",
+              "displayName": "customer_phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "booking_date",
+              "displayName": "booking_date",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "booking_time",
+              "displayName": "booking_time",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "number_of_guests",
+              "displayName": "number_of_guests",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "special_requests",
+              "displayName": "special_requests",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "11394c3d-e20a-47bf-b025-6259af397787",
+      "name": "Create New Table Booking",
+      "type": "n8n-nodes-base.postgres",
+      "position": [
+        928,
+        240
+      ],
+      "typeVersion": 2.6,
+      "credentials": {
+        "postgres": {
+          "id": "uwA6Tir4e1QGb2tk",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        608
+      ],
+      "id": "c235775b-2a69-4232-bb6b-bbc7cc295216",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        608
+      ],
+      "id": "da1fa460-24ff-4be1-bec6-31e9ae6e4a51",
+      "name": "2.5 Flash ",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "gbXpwdxdqhuKJaj9",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -320,
+        400
+      ],
+      "id": "0d1e6cd8-2326-464d-b9f2-0046eeb63b4b",
+      "name": "Telegram Trigger",
+      "webhookId": "e63e5615-c1ad-44f2-a269-332db8f3bd92",
+      "credentials": {
+        "telegramApi": {
+          "id": "SgctsPOD58aI10r7",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "instructions": "Extract these details\nCustomer name\nCustomer phone number\nNo. of guests\nAny special request\ndate and time they want to book [give date and time separately]\nMention AM or PM in time\n",
+        "codeGeneratedForPrompt": "Extract these details\nCustomer name\nCustomer phone number\nNo. of guests\nAny special request\ndate and time they want to book [give date and time separately]\nFor time use this format  (hh:mm:(:ss)) [don't include PM or AM]",
+        "jsCode": "const items = $input.all();\nconst bookings = items.map((item) => {\n  const lines = item.json.output.split(\"\\n\");\n  const booking = {};\n  lines.forEach((line) => {\n    if (line.startsWith(\"Customer name:\")) {\n      booking.customerName = line.replace(\"Customer name:\", \"\").trim();\n    } else if (line.startsWith(\"Customer phone number:\")) {\n      booking.phoneNumber = line.replace(\"Customer phone number:\", \"\").trim();\n    } else if (line.startsWith(\"No. of guests:\")) {\n      booking.guests = line.replace(\"No. of guests:\", \"\").trim();\n    } else if (line.startsWith(\"Any special request:\")) {\n      booking.specialRequest = line.replace(\"Any special request:\", \"\").trim();\n    } else if (line.startsWith(\"Date and time:\")) {\n      const dateTime = line.replace(\"Date and time:\", \"\").trim();\n      const [date, time] = dateTime.split(\",\");\n      booking.date = date.trim();\n      booking.time = time.trim().replace(\" PM\", \"\");\n    }\n  });\n  return booking;\n});\nreturn bookings;\n"
+      },
+      "type": "n8n-nodes-base.aiTransform",
+      "typeVersion": 1,
+      "position": [
+        752,
+        272
+      ],
+      "id": "1832e261-650a-4524-bd6e-e3da0d05bf6e",
+      "name": "AI Transform"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $('Extract Customer Query').item.json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        240
+      ],
+      "id": "7e8cbdb7-16eb-43be-bc33-dd38977724c8",
+      "name": "confirmation",
+      "webhookId": "da7c932e-06ee-441e-a807-10ec8ef28332",
+      "credentials": {
+        "telegramApi": {
+          "id": "SgctsPOD58aI10r7",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $('Extract Customer Query').item.json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        496
+      ],
+      "id": "5b218558-69db-45b3-beef-f3f1ce36fe13",
+      "name": "reply",
+      "webhookId": "da7c932e-06ee-441e-a807-10ec8ef28332",
+      "credentials": {
+        "telegramApi": {
+          "id": "SgctsPOD58aI10r7",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Wait For Response": {
+      "main": [
+        [
+          {
+            "node": "Check If Table Booking Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Customer Query": {
+      "main": [
+        [
+          {
+            "node": "Wait For Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Table Booking": {
+      "main": [
+        [
+          {
+            "node": "confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Table Booking Required": {
+      "main": [
+        [
+          {
+            "node": "AI Transform",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Extract Customer Query",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.5 Flash ": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract Customer Query",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract Customer Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Transform": {
+      "main": [
+        [
+          {
+            "node": "Create New Table Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "946924ec-6c49-4f14-ad7f-f159a1eb2942",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dfd570963f66daa8de8ab1ade05392186cc69eddd54632309bd587c2faeb7e2b"
+  },
+  "id": "KJASMgPig9Fkgw4D",
+  "tags": []
+}
