@@ -17,7 +17,7 @@ This portfolio includes:
 This is the frontend interface for the AI-powered Invoice Generator.
 
 - Live URL: https://builtinvoice.netlify.app/
-- Connected n8n Workflow: outreach system/Invoice_Generator.json
+- Connected n8n Workflow: **outreach system/Invoice_Generator.json**
 
 ## ⚙️ How It Works
 
@@ -25,6 +25,39 @@ This is the frontend interface for the AI-powered Invoice Generator.
 2. Data is sent via webhook to n8n.
 3. n8n processes data and triggers invoice creation logic.
 4. Output is returned as email.
+
+# 🎬 ScriptCraft – AI-Powered YouTube Scriptwriter
+
+**ScriptCraft** is an intelligent YouTube scriptwriter tool that helps creators generate full-length, engaging video scripts with just a simple prompt. Powered by GPT-4 and automated using [n8n]it streamlines content creation for YouTubers, marketers, and educators.
+
+> 🚀 Live Tool: [Scripcraft](https://script-craft.lovable.app/)  
+> 🔗 Connected Workflow: [`YT_Scriptwriter.json`](../../Social%20media/YT_Scriptwriter.json)
+
+---
+
+## ✨ Features
+
+- 🧠 AI-generated video scripts using Gemini with search feature
+- 🎯 Accepts video topic, style, and tone as input
+- 🪝 Generates:
+  - Hook
+  - Introduction
+  - Main script body (bulleted or paragraph style)
+  - CTA or Outro
+- 📋 Copy-ready output or JSON response
+- ⚡ Instant, browser-based interface
+
+---
+
+## 🧠 How It Works
+
+1. **User Input**  
+   - Enter a topic like `"How to grow on YouTube"`  
+   - Choose tone: Casual / Professional / Humorous  
+   - Optional: Provide context or keywords
+
+2. **Workflow Activation**  
+   - The frontend sends the data via a webhook
 
 
 
