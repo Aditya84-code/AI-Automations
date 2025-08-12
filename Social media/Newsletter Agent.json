@@ -1,0 +1,394 @@
+{
+  "name": "Newsletter Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=AI Tools & Releases Curator\n\n🟢 A - Ask:\nSend a daily newsletter summarizing 3 impactful AI tool launches, feature releases, model releases, and news.\n\n🟡 G - Guidance:\nrole: Insightful AI guide speaking in sixth-grade English\n\noutput_count: 1 newsletter per day (with 3 curated items)\n\ncharacter_limit: Max 100 words per news item\nconstraints:\n    - 🎯 Focus on newly launched AI tools or significant feature updates\n    - 🎵 Include text, music, sound, image, or video model news\n    - 🔥 Include viral or highly discussed stories in the AI community\n    - Must be impactful, innovative, or breaking\n    - Construct the subject line as: \"📰 Today's AI News: [top news headline] | [MM DD, YYYY]\"\n    - Use the most impactful story as the top news headline\n    - Include source link and publication date for each item\n    - Exclude economic news, funding, or stories already covered (check Google Sheet)\n\n🟢 E - Examples:\n  good_examples:\n    - \"OpenAI just launched GPT-5, and it's smarter, faster, and can use tools better than ever. You can even ask it to browse the web live. [source]\"\n    - \"Hugging Face released a new open-source vision model that beats CLIP in benchmarks. It’s already live on their demo page. [source]\"\n\n🔴 bad_examples:\n    - \"Apple releases new iPhone model with better cameras.\"\n    - \"Startup X raised $20M, but their AI app is still in beta.\"\n\n📝 N - Notation:\nformat: JSON\nexample_output: |\n{\n    \"subject_line\": \"📰 Today's AI Nuggets: OpenAI launches GPT-5 | July 18, 2025\",\n    \"news\": [\n        {\n            \"emoji\": \"🧠\",\n            \"title\": \"OpenAI launches GPT-5\",\n            \"content\": \"OpenAI has released GPT-5. It’s smarter, faster, and can use tools better than ever before. Now, it can even browse the web in real time. [source]\",\n            \"why_it_matters\": \"This could reshape how AI assistants handle real-world tasks and access information.\",\n            \"source\": \"https://example.com/openai-gpt5\",\n            \"date_published\": \"2025-07-18\"\n        },\n       {\n      \"emoji\": \"👁️\",\n      \"title\": \"New vision model from Hugging Face\",\n      \"content\": \"Hugging Face dropped a new model that beats CLIP at image-text tasks. It’s open-source and live now. [source]\",\n      \"why_it_matters\": \"Open-sourcing a SOTA vision model levels the playing field for AI devs everywhere.\",\n      \"source\": \"https://example.com/hf-vision-model\",\n      \"date_published\": \"2025-07-18\"\n    }\n    ]\n}\n\n🧰 T - Tools:\n\nYou have access to the following tools. You need to make use of all of these tools every run. Each one is described clearly:\n\n🧠 Think Tool: Use this to reflect and reason before responding and giving any output.\n\n🔍 Research Tool: Use this tool to research the latest impactful AI tools and feature releases.\n\n📊 Details Tool: Use this tool to filter out previously reported items.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5c58e763-d761-4645-a420-e671c281bcf2",
+      "name": "Newsletter Generator"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        128,
+        208
+      ],
+      "id": "42c39c71-3b2c-45e2-bd90-0056bed0aa1e",
+      "name": "GPT-OSS",
+      "credentials": {
+        "groqApi": {
+          "id": "4oDSznuALXl4pFi1",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "sonar",
+        "messages": {
+          "message": [
+            {
+              "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message0_Text', ``, 'string') }}"
+            }
+          ]
+        },
+        "simplify": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify_Output', ``, 'boolean') }}",
+        "options": {
+          "searchRecency": "week"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        400,
+        208
+      ],
+      "id": "0628b842-6d1a-428a-ae8b-ad4ee462620b",
+      "name": "Research",
+      "credentials": {
+        "perplexityApi": {
+          "id": "CQpjScryhb79c62V",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"subject_line\": \"📰 Today's AI News: OpenAI launches GPT-5 | July 18, 2025\",\n  \"news\": [\n    {\n      \"emoji\": \"🚀\",\n      \"title\": \"OpenAI launches GPT-5\",\n      \"content\": \"OpenAI has released GPT-5! It’s smarter, faster, and can use tools better than ever before. Now, it can even browse the web in real time. [source]\",\n      \"why_it_matters\": \"This could reshape how AI assistants handle real-world tasks and access information.\",\n      \"source\": \"https://example.com/openai-gpt5\",\n      \"date_published\": \"2025-07-18\"\n    },\n    {\n      \"emoji\": \"👁️\",\n      \"title\": \"New vision model from Hugging Face\",\n      \"content\": \"Hugging Face dropped a new model that beats CLIP at image-text tasks. It’s open-source and live now. [source]\",\n      \"why_it_matters\": \"Open-sourcing a SOTA vision model levels the playing field for AI devs everywhere.\",\n      \"source\": \"https://example.com/hf-vision-model\",\n      \"date_published\": \"2025-07-18\"\n    }\n  ]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        352,
+        -112
+      ],
+      "id": "5171f70f-c27f-4ef9-a481-73b88c595d38",
+      "name": "Structured Output "
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        -112
+      ],
+      "id": "ce94036c-ef4d-467d-b548-460bfb8b7d6f",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Uwn1DGqV2jrXgtq8OGB1QCacoSHyEhs5rauGrIH2vbo",
+          "mode": "list",
+          "cachedResultName": "Newsletter",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Uwn1DGqV2jrXgtq8OGB1QCacoSHyEhs5rauGrIH2vbo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Uwn1DGqV2jrXgtq8OGB1QCacoSHyEhs5rauGrIH2vbo/edit#gid=0"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "B:B"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        272,
+        208
+      ],
+      "id": "d164242e-8bb1-40ea-93da-2c32ed2e1fc6",
+      "name": "Details",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0QAqxtoO3zaEZ5NB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access the array of news from the input data\nconst newsArray = items[0].json.output.news;\n\n// The .map() function loops through each item in the newsArray\nreturn newsArray.map(newsItem => {\n  // --- Start of Transformation ---\n\n  // 1. Format the date for the subject line\n  const formattedDate = new Date(newsItem.date_published).toLocaleDateString('en-US', {\n    year: 'numeric',\n    month: 'long',\n    day: 'numeric',\n    timeZone: 'UTC' // Use UTC to ensure consistent date parsing\n  });\n\n  // 2. Create the new subject line\n  const subjectLine = `Today's AI News: ${newsItem.title} | ${formattedDate}`;\n\n  // 3. Build the new JSON object with only the desired fields\n  const finalJson = {\n    subject_line: subjectLine,\n    title: newsItem.title,\n    content: newsItem.content,\n    source: newsItem.source,\n    date_published: newsItem.date_published\n  };\n  \n  // --- End of Transformation ---\n\n  // Return the newly structured object as a new n8n item\n  return {\n    json: finalJson\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "ef3b325e-0959-4e17-bd39-198ffe832904",
+      "name": "Structure data"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Uwn1DGqV2jrXgtq8OGB1QCacoSHyEhs5rauGrIH2vbo",
+          "mode": "list",
+          "cachedResultName": "Newsletter",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Uwn1DGqV2jrXgtq8OGB1QCacoSHyEhs5rauGrIH2vbo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Uwn1DGqV2jrXgtq8OGB1QCacoSHyEhs5rauGrIH2vbo/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "-(ROW) -1",
+            "TOPIC": "={{ $json.title }}",
+            "DESCRIPTION": "={{ $json.content }} [{{ $json.source }}]",
+            "DATE-SENT": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TOPIC",
+              "displayName": "TOPIC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DESCRIPTION",
+              "displayName": "DESCRIPTION",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DATE-SENT",
+              "displayName": "DATE-SENT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        768,
+        0
+      ],
+      "id": "2edbaf04-9b7f-4e1a-985f-52b16afe3ec2",
+      "name": "Add newsletter",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0QAqxtoO3zaEZ5NB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        -176
+      ],
+      "id": "9f7161d1-cd9a-47e6-a6ac-ceee9078b8f7",
+      "name": "reply",
+      "webhookId": "7110f95a-1d8e-4d02-8b7e-c1f6c8002bfb",
+      "credentials": {
+        "telegramApi": {
+          "id": "zfWC94hm9fd3zPgS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        0
+      ],
+      "id": "af02110d-649f-414d-ae8a-ff4c67a3d07d",
+      "name": "Telegram Trigger",
+      "webhookId": "dcfda351-51b6-4048-9798-947b9ae7194a",
+      "credentials": {
+        "telegramApi": {
+          "id": "zfWC94hm9fd3zPgS",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "GPT-OSS": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Newsletter Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research": {
+      "ai_tool": [
+        [
+          {
+            "node": "Newsletter Generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output ": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Newsletter Generator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Newsletter Generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Details": {
+      "ai_tool": [
+        [
+          {
+            "node": "Newsletter Generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Newsletter Generator": {
+      "main": [
+        [
+          {
+            "node": "Structure data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structure data": {
+      "main": [
+        [
+          {
+            "node": "Add newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add newsletter": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Newsletter Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fd30d514-2df7-457c-979c-a698adc377b6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c13481d78d744b55c10aa98d7b65b36b84e34529813fee8fbecbd0b28f44207a"
+  },
+  "id": "OPPb8hTbrv314EuD",
+  "tags": []
+}
