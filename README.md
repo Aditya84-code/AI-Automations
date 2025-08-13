@@ -17,7 +17,7 @@ This portfolio includes:
 
 This is the frontend interface for the AI-powered Invoice Generator.
 
-- Live URL: [Invice Generator](https://builtinvoice.netlify.app/)
+- Live URL: [Invoice Generator](https://builtinvoice.netlify.app/)
 - Connected n8n Workflow: **outreach system/Invoice_Generator.json**
 
 ---
