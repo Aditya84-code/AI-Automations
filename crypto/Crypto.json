@@ -1,0 +1,602 @@
+{
+  "name": "Crypto",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $json.body.symbol}}USDT&interval=15m&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        0
+      ],
+      "id": "37afdba9-bfde-4a91-9133-4ba5ee860648",
+      "name": "15 min"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $('Webhook').item.json.body.symbol }}USDT&interval=1h&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "d06e6b1f-689e-4cf6-8375-0768b231c761",
+      "name": "60mins"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        304,
+        0
+      ],
+      "id": "baff3fc1-5d88-4825-8b36-7a5a26aaf692",
+      "name": "data1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        688,
+        0
+      ],
+      "id": "55f459dd-6180-4f68-82aa-61138aa5896d",
+      "name": "data2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        336,
+        160
+      ],
+      "id": "51f55c12-ef17-40ef-ae72-6abaa1ba7d08",
+      "name": "data3"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $('Webhook').item.json.body.symbol }}USDT&interval=1d&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        192,
+        160
+      ],
+      "id": "dbbd1166-1082-4986-968c-41e1e405de60",
+      "name": "24hours"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $('Webhook').item.json.body.symbol }}USDT&interval=1M&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        160
+      ],
+      "id": "e0541f44-60da-41d6-abe4-8deca49786ad",
+      "name": "1month"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        672,
+        160
+      ],
+      "id": "75c7e813-bf2a-4f60-889a-5127c4a9337e",
+      "name": "data4"
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/everything",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "=Crypto OR Bitcoin OR {{ $workflow.name }}USDT"
+            },
+            {
+              "name": "from",
+              "value": "={{new Date(Date.now() - 3 *24 * 60 * 60 * 1000).toISOString()}}"
+            },
+            {
+              "name": "sortBy",
+              "value": "popularity"
+            },
+            {
+              "name": "apiKey",
+              "value": "30d1f0b69a7945ac92b0c7114fd1c23b"
+            },
+            {
+              "name": "language",
+              "value": "en"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        160
+      ],
+      "id": "5dc0c841-bf16-4bb5-8b95-4e933a46043d",
+      "name": "news"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "articles",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        160
+      ],
+      "id": "47f82f8c-e5fa-4956-b7e9-b14396789095",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        160
+      ],
+      "id": "0fc31f00-e820-4879-b2be-89d7ad9dc10a",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        432,
+        544
+      ],
+      "id": "eeff4d95-96c5-4b7b-945b-175367af9536",
+      "name": "2.5 Flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Y6eQNgP0SVXpWexy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"shortTermAnalysis\": \"Summary of short-term trends or insights.\",\n  \"longTermAnalysis\": \"Summary of long-term trends or projections.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        544
+      ],
+      "id": "72d0d456-8a5c-4384-a8fc-caf455ce2762",
+      "name": "Structured"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"shortTerm\": {\n    \"action\": \"\",\n    \"entryPrice\": \"\",\n    \"stopLoss\": \"\",\n    \"takeProfit\": \"\",\n    \"rationale\": \"\",\n    \"primarySignals\": \"\",\n    \"laggingIndicators\": \"\",\n    \"sentimentAnalysis\": \"\"\n  },\n  \"longTerm\": {\n    \"action\": \"\",\n    \"entryPrice\": \"\",\n    \"stopLoss\": \"\",\n    \"takeProfit\": \"\",\n    \"rationale\": \"\",\n    \"primarySignals\": \"\",\n    \"laggingIndicators\": \"\",\n    \"sentimentAnalysis\": \"\"\n  },\n  \"leveragedRecommendations\": {\n    \"shortTerm\": {\n      \"position\": \"\",\n      \"leverage\": \"\",\n      \"entryPrice\": \"\",\n      \"stopLoss\": \"\",\n      \"takeProfit\": \"\",\n      \"rationale\": \"\",\n      \"primaryPriceActionSignals\": \"\",\n      \"laggingIndicatorConfirmation\": \"\",\n      \"sentimentAndMacroAnalysis\": \"\"\n    },\n    \"longTerm\": {\n      \"position\": \"\",\n      \"leverage\": \"\",\n      \"entryPrice\": \"\",\n      \"stopLoss\": \"\",\n      \"takeProfit\": \"\",\n      \"rationale\": \"\",\n      \"primaryPriceActionSignals\": \"\",\n      \"laggingIndicatorConfirmation\": \"\",\n      \"sentimentAndMacroAnalysis\": \"\"\n    }\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        544
+      ],
+      "id": "46b95f08-68a6-48c7-9eab-2d6d2fb1ecb6",
+      "name": "Strcuture"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        784,
+        544
+      ],
+      "id": "6c106d46-fc22-417d-8aa5-57492a872dfa",
+      "name": "2.5 Pro",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Y6eQNgP0SVXpWexy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        912,
+        544
+      ],
+      "id": "39a1a7bd-6571-4da2-b0b6-117da7fa5a19",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "content": "## CandleStick Data\n",
+        "height": 352,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        128,
+        -64
+      ],
+      "id": "5e468faf-db27-4879-b024-a65e38621ba3",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Crypto News",
+        "height": 208,
+        "width": 512,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        896,
+        112
+      ],
+      "id": "8d16b719-add3-438f-adf9-cb9768285011",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Analysis",
+        "height": 352,
+        "width": 864
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        352
+      ],
+      "typeVersion": 1,
+      "id": "99e3873e-3e81-4081-9440-d4e9605acbe7",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "b3715478-ba9f-470e-a8f8-87f2bfbe2c27",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "e3855059-73db-4325-939b-44a97f157847",
+      "name": "Webhook",
+      "webhookId": "b3715478-ba9f-470e-a8f8-87f2bfbe2c27"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent and accurate sentiment analyzer specializing in cryptocurrency markets. Analyze the sentiment of the provided text using a two-part approach:\n\nShort-Term Sentiment:\n\nEvaluate the immediate market reaction, recent news impact, and technical volatility.\n\nDetermine a sentiment category: \"Positive\", \"Neutral\", or \"Negative\".\n\nCalculate a numerical score between -1 (extremely negative) and 1 (extremely positive).\n\nProvide a concise rationale explaining the short-term sentiment (give a detailed response with appropriate headlines for major events, and cryptocurrencies).\n\nLong-Term Sentiment:\n\nEvaluate the overall market outlook, fundamentals, and regulatory or macroeconomic factors.\n\nDetermine a sentiment category: \"Positive\", \"Neutral\", or \"Negative\".\n\nCalculate a numerical score between -1 (extremely negative) and 1 (extremely positive).\n\nProvide a detailed rationale explaining the long-term sentiment (give a detailed response with appropriate headlines for major events, and cryptocurrencies).\n\n\nYour output must be exactly a JSON object with exactly two keys: \"shortTermSentiment\" and \"longTermSentiment\". The value of each key must be an object with three keys: \"category\", \"score\", and \"rationale\". Do not output any additional text.\n\nOutput only one analysis one short-term and one long-term. Do one round for all of these articles and add only one thing.\nHere are the articles:{{ $json.content }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        464,
+        384
+      ],
+      "id": "cf8ecb20-628e-47e5-85df-2dc4b32c9bb4",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=This for:{{ $('Webhook').item.json.body.symbol }}USDT\n\nThis the analysis I got from scrapping articles:\n\nShort term:{{ $json.output.shortTermAnalysis }}\n\nLong Term:{{ $json.output.longTermAnalysis }}\n\nHere is all the techical data:\nHere is the price of it for the last:\n\n15 minutes{{ JSON.stringify($('data1').item.json.data1[0]) }}\n\n1 hour: {{ JSON.stringify($('data2').item.json.data2[0]) }}\n\n1 day:{{ JSON.stringify($('data3').item.json.data3[0])}}\n\n1 month:  {{ JSON.stringify($('data4').item.json.data4[0]) }}\n\nThis is a JSON array where each element is a candlestick data object for a crypto asset. Each object has the following structure:\n\ntimeframe: either \"15m\", \"1h\", or \"1d\", or \"1 month\"\n\ncandles: an array of values in the following order:\n[openTime, open, high, low, close, volume, closeTime, quoteVolume, trades, takerBuyBaseVolume, takerBuyQuoteVolume, ignore]\n\nSentiment Data: At the end of the JSON array there is also a long term and short term sentiment analysis based on crypto news headlines for the past 3 days.\n\nUse \"Think\" tool before responding\n\nPlease perform the following steps:\n\nGroup the Data:\nGroup the candlestick objects by timeframe into four groups:\n\nShort-term data: \"15m\" candles\n\nMedium-term data: \"1h\" candles\n\nLong-term data: \"1d\" candles\n\nVery Long term: \"1\" month\n\nAnalyze the Data in Detail:\n\nShort-term Analysis:\nUse the 15m candles (with supportive insights from the 1h candles) to evaluate volatility and determine near-term support and resistance levels. In your analysis, combine traditional lagging indicators (such as MACD, RSI, and OBV) as confirmation tools with direct price action elements—like key support/resistance zones, trendlines, and divergence patterns. Focus on these price-based signals to capture immediate market sentiment and structural levels.\n\nLong-term Analysis:\nUse the 1d candles and 1 month (and relevant insights from the 1h candles) to assess the overall market direction and major support/resistance zones. Here, integrate long-term trendlines and divergence signals along with lagging indicators to understand the broader market context and potential structural shifts.\n\nAction: (buy, sell, or hold)\nEntry Price:\nStop-Loss Level:\nTake Profit (TP) Level:\nRationale: Provide an extremely detailed explanation of your recommendation. Break down your rationale into three parts:\na. Primary Signals: Describe key price action insights (support/resistance zones, trendline breakouts or bounces, divergence patterns).\nb. Lagging Indicators: Explain how indicators (MACD, RSI, OBV, etc.) confirm or supplement these signals.\nc. Sentiment Analysis: Discuss volume trends, market sentiment, and macro factors. Combine these elements into one comprehensive explanation.\n\nFor Leveraged Trading:\n\nPosition: (long or short)\nRecommended Leverage: (e.g., 3x, 5x, etc.)\nEntry Price:\nStop-Loss Level:\nTake Profit (TP) Level:\nRationale: Provide a detailed explanation that similarly breaks down your rationale into:\na. Primary Price Action Signals: Outline key support/resistance levels, trendlines, and divergence patterns.\nb. Lagging Indicator Confirmation: Describe how indicators validate these signals.\nc. Sentiment & Macro Analysis: Include analysis of volume trends, overall market sentiment, and broader economic factors.\n\nOutput Format:\nReturn the final result as plain text with consistent styling for Telegram (html).\n\nEach section header (e.g., \"Spot Recommendations\") is in bold.\nEach sub-section (e.g., Primary Signals, Lagging Indicators, Sentiment Analysis) is also in bold.\n\nUse clear line breaks between sections and bullet points for clarity.\nGive the output in JSON Format\n\nShort-term:\nAction: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\nRationale:\n\nPrimary Signals: ...\n\nLagging Indicators: ...\n\nSentiment Analysis: ...\n\nLong-term:\nAction: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\nRationale:\n\nPrimary Signals: ...\n\nLagging Indicators: ...\n\nSentiment Analysis: ...\n\nLeveraged Recommendations:\n\nShort-Term:\n\nPosition: ...\n\nLeverage: ...\n\nEntry Price: ...\n\nStop Loss: ...\n\nTake Profit: ...\n\nRationale:\n\nPrimary Price Action Signals: ...\n\nLagging Indicator Confirmation: ...\n\nSentiment & Macro Analysis: ...\n\nLong-Term:\n\nPosition: ...\n\nLeverage: ...\n\nEntry Price: ...\n\nStop Loss: ...\n\nTake Profit: ...\n\nRationale:\n\nPrimary Price Action Signals: ...\n\nLagging Indicator Confirmation: ...\n\nSentiment & Macro Analysis: ...",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        816,
+        384
+      ],
+      "id": "3b8480bb-b5de-4660-9bca-1a4dfa548637",
+      "name": "Response based on data"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1264,
+        384
+      ],
+      "id": "5dbabd51-a680-4ecb-a2d7-8bedab1ccaca",
+      "name": "Respond Back"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "15 min": {
+      "main": [
+        [
+          {
+            "node": "data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "60mins": {
+      "main": [
+        [
+          {
+            "node": "data2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data1": {
+      "main": [
+        [
+          {
+            "node": "60mins",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data2": {
+      "main": [
+        [
+          {
+            "node": "24hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "24hours": {
+      "main": [
+        [
+          {
+            "node": "data3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data3": {
+      "main": [
+        [
+          {
+            "node": "1month",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1month": {
+      "main": [
+        [
+          {
+            "node": "data4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data4": {
+      "main": [
+        [
+          {
+            "node": "news",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "news": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.5 Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Strcuture": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Response based on data",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.5 Pro": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Response based on data",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Response based on data",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Response based on data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "15 min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response based on data": {
+      "main": [
+        [
+          {
+            "node": "Respond Back",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bf09b43c-de7a-405c-b8d6-54184aa6848c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "94d132d9666401022266a056fe800141caf8876703229948f8b6037f65c93cae"
+  },
+  "id": "5nUOrDkQuPVJt4Dq",
+  "tags": []
+}
