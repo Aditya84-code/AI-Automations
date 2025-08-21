@@ -1,0 +1,1310 @@
+{
+  "name": "Crypto",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $json.body.symbol}}USDT&interval=15m&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "37afdba9-bfde-4a91-9133-4ba5ee860648",
+      "name": "15 min"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $('Webhook').item.json.body.symbol }}USDT&interval=1h&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        176,
+        0
+      ],
+      "id": "d06e6b1f-689e-4cf6-8375-0768b231c761",
+      "name": "60mins"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "baff3fc1-5d88-4825-8b36-7a5a26aaf692",
+      "name": "data1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        304,
+        0
+      ],
+      "id": "55f459dd-6180-4f68-82aa-61138aa5896d",
+      "name": "data2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        160
+      ],
+      "id": "51f55c12-ef17-40ef-ae72-6abaa1ba7d08",
+      "name": "data3"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $('Webhook').item.json.body.symbol }}USDT&interval=1d&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -192,
+        160
+      ],
+      "id": "dbbd1166-1082-4986-968c-41e1e405de60",
+      "name": "24hours"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $('Webhook').item.json.body.symbol }}USDT&interval=1M&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        144,
+        160
+      ],
+      "id": "e0541f44-60da-41d6-abe4-8deca49786ad",
+      "name": "1month"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        288,
+        160
+      ],
+      "id": "75c7e813-bf2a-4f60-889a-5127c4a9337e",
+      "name": "data4"
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/everything",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "=Crypto OR Bitcoin OR {{ $workflow.name }}USDT"
+            },
+            {
+              "name": "from",
+              "value": "={{new Date(Date.now() - 3 *24 * 60 * 60 * 1000).toISOString()}}"
+            },
+            {
+              "name": "sortBy",
+              "value": "popularity"
+            },
+            {
+              "name": "apiKey",
+              "value": "30d1f0b69a7945ac92b0c7114fd1c23b"
+            },
+            {
+              "name": "language",
+              "value": "en"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        576,
+        160
+      ],
+      "id": "5dc0c841-bf16-4bb5-8b95-4e933a46043d",
+      "name": "news"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "articles",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        720,
+        160
+      ],
+      "id": "47f82f8c-e5fa-4956-b7e9-b14396789095",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        864,
+        160
+      ],
+      "id": "0fc31f00-e820-4879-b2be-89d7ad9dc10a",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        48,
+        544
+      ],
+      "id": "eeff4d95-96c5-4b7b-945b-175367af9536",
+      "name": "2.5 Flash",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Y6eQNgP0SVXpWexy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"shortTermAnalysis\": \"Summary of short-term trends or insights.\",\n  \"longTermAnalysis\": \"Summary of long-term trends or projections.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        544
+      ],
+      "id": "72d0d456-8a5c-4384-a8fc-caf455ce2762",
+      "name": "Structured"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"shortTerm\": {\n    \"action\": \"\",\n    \"entryPrice\": \"\",\n    \"stopLoss\": \"\",\n    \"takeProfit\": \"\",\n    \"rationale\": \"\",\n    \"primarySignals\": \"\",\n    \"laggingIndicators\": \"\",\n    \"sentimentAnalysis\": \"\"\n  },\n  \"longTerm\": {\n    \"action\": \"\",\n    \"entryPrice\": \"\",\n    \"stopLoss\": \"\",\n    \"takeProfit\": \"\",\n    \"rationale\": \"\",\n    \"primarySignals\": \"\",\n    \"laggingIndicators\": \"\",\n    \"sentimentAnalysis\": \"\"\n  },\n  \"leveragedRecommendations\": {\n    \"shortTerm\": {\n      \"position\": \"\",\n      \"leverage\": \"\",\n      \"entryPrice\": \"\",\n      \"stopLoss\": \"\",\n      \"takeProfit\": \"\",\n      \"rationale\": \"\",\n      \"primaryPriceActionSignals\": \"\",\n      \"laggingIndicatorConfirmation\": \"\",\n      \"sentimentAndMacroAnalysis\": \"\"\n    },\n    \"longTerm\": {\n      \"position\": \"\",\n      \"leverage\": \"\",\n      \"entryPrice\": \"\",\n      \"stopLoss\": \"\",\n      \"takeProfit\": \"\",\n      \"rationale\": \"\",\n      \"primaryPriceActionSignals\": \"\",\n      \"laggingIndicatorConfirmation\": \"\",\n      \"sentimentAndMacroAnalysis\": \"\"\n    }\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        656,
+        544
+      ],
+      "id": "46b95f08-68a6-48c7-9eab-2d6d2fb1ecb6",
+      "name": "Strcuture"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        400,
+        544
+      ],
+      "id": "6c106d46-fc22-417d-8aa5-57492a872dfa",
+      "name": "2.5 Pro",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Y6eQNgP0SVXpWexy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1.1,
+      "position": [
+        528,
+        544
+      ],
+      "id": "39a1a7bd-6571-4da2-b0b6-117da7fa5a19",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "content": "## CandleStick Data\n",
+        "height": 352,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -64
+      ],
+      "id": "5e468faf-db27-4879-b024-a65e38621ba3",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Crypto News",
+        "height": 208,
+        "width": 512,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        512,
+        112
+      ],
+      "id": "8d16b719-add3-438f-adf9-cb9768285011",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Analysis",
+        "height": 352,
+        "width": 864
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        352
+      ],
+      "typeVersion": 1,
+      "id": "99e3873e-3e81-4081-9440-d4e9605acbe7",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "b3715478-ba9f-470e-a8f8-87f2bfbe2c27",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -448,
+        0
+      ],
+      "id": "e3855059-73db-4325-939b-44a97f157847",
+      "name": "Webhook",
+      "webhookId": "b3715478-ba9f-470e-a8f8-87f2bfbe2c27"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent and accurate sentiment analyzer specializing in cryptocurrency markets. Analyze the sentiment of the provided text using a two-part approach:\n\nShort-Term Sentiment:\n\nEvaluate the immediate market reaction, recent news impact, and technical volatility.\n\nDetermine a sentiment category: \"Positive\", \"Neutral\", or \"Negative\".\n\nCalculate a numerical score between -1 (extremely negative) and 1 (extremely positive).\n\nProvide a concise rationale explaining the short-term sentiment (give a detailed response with appropriate headlines for major events, and cryptocurrencies).\n\nLong-Term Sentiment:\n\nEvaluate the overall market outlook, fundamentals, and regulatory or macroeconomic factors.\n\nDetermine a sentiment category: \"Positive\", \"Neutral\", or \"Negative\".\n\nCalculate a numerical score between -1 (extremely negative) and 1 (extremely positive).\n\nProvide a detailed rationale explaining the long-term sentiment (give a detailed response with appropriate headlines for major events, and cryptocurrencies).\n\n\nYour output must be exactly a JSON object with exactly two keys: \"shortTermSentiment\" and \"longTermSentiment\". The value of each key must be an object with three keys: \"category\", \"score\", and \"rationale\". Do not output any additional text.\n\nOutput only one analysis one short-term and one long-term. Do one round for all of these articles and add only one thing.\nHere are the articles:{{ $json.content }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        80,
+        384
+      ],
+      "id": "cf8ecb20-628e-47e5-85df-2dc4b32c9bb4",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=This for:{{ $('Webhook').item.json.body.symbol }}USDT\n\nThis the analysis I got from scrapping articles:\n\nShort term:{{ $json.output.shortTermAnalysis }}\n\nLong Term:{{ $json.output.longTermAnalysis }}\n\nHere is all the techical data:\nHere is the price of it for the last:\n\n15 minutes{{ JSON.stringify($('data1').item.json.data1[0]) }}\n\n1 hour: {{ JSON.stringify($('data2').item.json.data2[0]) }}\n\n1 day:{{ JSON.stringify($('data3').item.json.data3[0])}}\n\n1 month:  {{ JSON.stringify($('data4').item.json.data4[0]) }}\n\nThis is a JSON array where each element is a candlestick data object for a crypto asset. Each object has the following structure:\n\ntimeframe: either \"15m\", \"1h\", or \"1d\", or \"1 month\"\n\ncandles: an array of values in the following order:\n[openTime, open, high, low, close, volume, closeTime, quoteVolume, trades, takerBuyBaseVolume, takerBuyQuoteVolume, ignore]\n\nSentiment Data: At the end of the JSON array there is also a long term and short term sentiment analysis based on crypto news headlines for the past 3 days.\n\nUse \"Think\" tool before responding\n\nPlease perform the following steps:\n\nGroup the Data:\nGroup the candlestick objects by timeframe into four groups:\n\nShort-term data: \"15m\" candles\n\nMedium-term data: \"1h\" candles\n\nLong-term data: \"1d\" candles\n\nVery Long term: \"1\" month\n\nAnalyze the Data in Detail:\n\nShort-term Analysis:\nUse the 15m candles (with supportive insights from the 1h candles) to evaluate volatility and determine near-term support and resistance levels. In your analysis, combine traditional lagging indicators (such as MACD, RSI, and OBV) as confirmation tools with direct price action elements—like key support/resistance zones, trendlines, and divergence patterns. Focus on these price-based signals to capture immediate market sentiment and structural levels.\n\nLong-term Analysis:\nUse the 1d candles and 1 month (and relevant insights from the 1h candles) to assess the overall market direction and major support/resistance zones. Here, integrate long-term trendlines and divergence signals along with lagging indicators to understand the broader market context and potential structural shifts.\n\nAction: (buy, sell, or hold)\nEntry Price:\nStop-Loss Level:\nTake Profit (TP) Level:\nRationale: Provide an extremely detailed explanation of your recommendation. Break down your rationale into three parts:\na. Primary Signals: Describe key price action insights (support/resistance zones, trendline breakouts or bounces, divergence patterns).\nb. Lagging Indicators: Explain how indicators (MACD, RSI, OBV, etc.) confirm or supplement these signals.\nc. Sentiment Analysis: Discuss volume trends, market sentiment, and macro factors. Combine these elements into one comprehensive explanation.\n\nFor Leveraged Trading:\n\nPosition: (long or short)\nRecommended Leverage: (e.g., 3x, 5x, etc.)\nEntry Price:\nStop-Loss Level:\nTake Profit (TP) Level:\nRationale: Provide a detailed explanation that similarly breaks down your rationale into:\na. Primary Price Action Signals: Outline key support/resistance levels, trendlines, and divergence patterns.\nb. Lagging Indicator Confirmation: Describe how indicators validate these signals.\nc. Sentiment & Macro Analysis: Include analysis of volume trends, overall market sentiment, and broader economic factors.\n\nOutput Format:\nReturn the final result as plain text with consistent styling for Telegram (html).\n\nEach section header (e.g., \"Spot Recommendations\") is in bold.\nEach sub-section (e.g., Primary Signals, Lagging Indicators, Sentiment Analysis) is also in bold.\n\nUse clear line breaks between sections and bullet points for clarity.\nGive the output in JSON Format\n\nShort-term:\nAction: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\nRationale:\n\nPrimary Signals: ...\n\nLagging Indicators: ...\n\nSentiment Analysis: ...\n\nLong-term:\nAction: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\nRationale:\n\nPrimary Signals: ...\n\nLagging Indicators: ...\n\nSentiment Analysis: ...\n\nLeveraged Recommendations:\n\nShort-Term:\n\nPosition: ...\n\nLeverage: ...\n\nEntry Price: ...\n\nStop Loss: ...\n\nTake Profit: ...\n\nRationale:\n\nPrimary Price Action Signals: ...\n\nLagging Indicator Confirmation: ...\n\nSentiment & Macro Analysis: ...\n\nLong-Term:\n\nPosition: ...\n\nLeverage: ...\n\nEntry Price: ...\n\nStop Loss: ...\n\nTake Profit: ...\n\nRationale:\n\nPrimary Price Action Signals: ...\n\nLagging Indicator Confirmation: ...\n\nSentiment & Macro Analysis: ...",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        384
+      ],
+      "id": "3b8480bb-b5de-4660-9bca-1a4dfa548637",
+      "name": "Response based on data"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        864,
+        384
+      ],
+      "id": "5dbabd51-a680-4ecb-a2d7-8bedab1ccaca",
+      "name": "Respond Back"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $json.chatInput }}USDT&interval=15m&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2208,
+        -48
+      ],
+      "id": "a9c933e7-29ac-4710-b1f0-1c36ed788fb4",
+      "name": "15 min1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $('Enter coin').item.json.chatInput }}USDT&interval=1h&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2608,
+        -48
+      ],
+      "id": "bfbbce4c-a8f6-4828-a9c2-89147401cc3a",
+      "name": "60mins1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2352,
+        -48
+      ],
+      "id": "bafbf411-dffe-45a3-b28e-071e3de6df99",
+      "name": "data"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2736,
+        -48
+      ],
+      "id": "24c51ea6-973f-4453-bc33-d8cbd71ccec6",
+      "name": "data5"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        112
+      ],
+      "id": "ca7aaa7a-4702-4018-8413-f8ae520cecb6",
+      "name": "data6"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $('Enter coin').item.json.chatInput }}USDT&interval=1d&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2240,
+        112
+      ],
+      "id": "a3e9c63f-625b-43a0-ac2a-e5636c1a0a70",
+      "name": "24hours1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.binance.com/api/v3/klines?symbol={{ $('Enter coin').item.json.chatInput }}USDT&interval=1M&limit=1\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2576,
+        112
+      ],
+      "id": "3c13c421-cf72-49c3-9556-16dccaa0681b",
+      "name": "1month1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "data4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2720,
+        112
+      ],
+      "id": "1e4b61f6-8602-474a-8a98-c8962456684b",
+      "name": "data7"
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/everything",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "=Crypto OR Bitcoin OR {{ $('Enter coin').item.json.chatInput }}USDT"
+            },
+            {
+              "name": "from",
+              "value": "={{new Date(Date.now() - 3 *24 * 60 * 60 * 1000).toISOString()}}"
+            },
+            {
+              "name": "sortBy",
+              "value": "popularity"
+            },
+            {
+              "name": "apiKey",
+              "value": "30d1f0b69a7945ac92b0c7114fd1c23b"
+            },
+            {
+              "name": "language",
+              "value": "en"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3008,
+        112
+      ],
+      "id": "44785a2d-c247-40e1-ba25-d6afba95e2ac",
+      "name": "news1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "articles",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3152,
+        112
+      ],
+      "id": "6a9dce8b-8b8b-4998-8ab7-a2bf43fa53a0",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3296,
+        112
+      ],
+      "id": "7acb1a20-c93b-4207-815f-6c50a4d69939",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2720,
+        528
+      ],
+      "id": "b47ee9e0-18b7-4c85-bfb5-fa243055b285",
+      "name": "2.5 Flash1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Y6eQNgP0SVXpWexy",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## CandleStick Data\n",
+        "height": 352,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2176,
+        -112
+      ],
+      "id": "f4b84d1c-4b58-497c-8478-a618f62b689c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Crypto News",
+        "height": 208,
+        "width": 512,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2944,
+        64
+      ],
+      "id": "82c02093-9bb4-4bfc-95ee-ce71075b2866",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Analysis",
+        "height": 352,
+        "width": 864
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2352,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "4e556bfe-6a85-4c09-9aeb-b4762fd56e9a",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a highly intelligent and accurate sentiment analyzer specializing in cryptocurrency markets. Analyze the sentiment of the provided text using a two-part approach:\n\nShort-Term Sentiment:\n\nEvaluate the immediate market reaction, recent news impact, and technical volatility.\n\nDetermine a sentiment category: \"Positive\", \"Neutral\", or \"Negative\".\n\nCalculate a numerical score between -1 (extremely negative) and 1 (extremely positive).\n\nProvide a concise rationale explaining the short-term sentiment (give a detailed response with appropriate headlines for major events, and cryptocurrencies).\n\nLong-Term Sentiment:\n\nEvaluate the overall market outlook, fundamentals, and regulatory or macroeconomic factors.\n\nDetermine a sentiment category: \"Positive\", \"Neutral\", or \"Negative\".\n\nCalculate a numerical score between -1 (extremely negative) and 1 (extremely positive).\n\nProvide a detailed rationale explaining the long-term sentiment (give a detailed response with appropriate headlines for major events, and cryptocurrencies).\n\n\nYour output must be exactly a JSON object with exactly two keys: \"shortTermSentiment\" and \"longTermSentiment\". The value of each key must be an object with three keys: \"category\", \"score\", and \"rationale\". Do not output any additional text.\n\nOutput only one analysis one short-term and one long-term. Do one round for all of these articles and add only one thing.\nHere are the articles:{{ $json.content }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        2512,
+        336
+      ],
+      "id": "c9c4a7a1-2685-42a5-8c5d-51113b5734bf",
+      "name": "Sentiment Analysis1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=This analysis is for: {{ $('Enter coin').item.json.chatInput }}USDT\n\nInput Data Collected\n\nScraped Articles (Initial Analysis):\n• Short Term: {{ $json.output.shortTermAnalysis }}\n• Long Term: {{ $json.output.longTermAnalysis }}\n\nTechnical Data (Candlestick History):\n\n15 minutes: {{ JSON.stringify($('data').item.json.data1[0]) }}\n1 hour: {{ JSON.stringify($('data5').item.json.data2[0]) }}\n1 day: {{ JSON.stringify($('data6').item.json.data3[0]) }}\n1 month: {{ JSON.stringify($('data7').item.json.data4[0]) }}\n\nEach candlestick data object contains:\n[openTime, open, high, low, close, volume, closeTime, quoteVolume, trades, takerBuyBaseVolume, takerBuyQuoteVolume, ignore]\n\nSentiment Data:\nIncludes short-term and long-term sentiment analysis derived from crypto news headlines (past 3 days).\n\nTools to Use\n- Research Tool: Research additional reliable market insights, news, and analysis to enrich conclusions and validate signals.\n\nRequired Steps\n\nGroup Data by Timeframe:\n• Short-term: 15m candles\n• Medium-term: 1h candles\n• Long-term: 1d candles\n• Very Long-term: 1m candles\n\nPerform Detailed Analysis:\n\nShort-term Analysis:\n• Use 15m and 1h candles.\n• Focus on volatility, near-term support/resistance, divergence patterns, and momentum.\n• Apply MACD, RSI, OBV for confirmation.\n\nLong-term Analysis:\n• Use 1d and 1m candles (with 1h as supporting data).\n• Focus on trendlines, major zones, divergence signals, and overall market structure.\n• Apply lagging indicators to confirm structural shifts.\n\nExample Output\n\n<b>Spot Recommendations</b>\n\n<b>Short-Term</b>\nAction: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\n<b>Rationale:</b>\n<b>Primary Signals:</b> ...\n<b>Lagging Indicators:</b> ...\n<b>Sentiment Analysis:</b> ...\n\n<b>Long-Term</b>\nAction: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\n<b>Rationale:</b>\n<b>Primary Signals:</b> ...\n<b>Lagging Indicators:</b> ...\n<b>Sentiment Analysis:</b> ...\n\n<b>Leveraged Recommendations</b>\n\n<b>Short-Term</b>\nPosition: ...\nLeverage: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\n<b>Rationale:</b>\n<b>Primary Signals:</b> ...\n<b>Lagging Indicators:</b> ...\n<b>Sentiment Analysis:</b> ...\n\n<b>Long-Term</b>\nPosition: ...\nLeverage: ...\nEntry Price: ...\nStop Loss: ...\nTake Profit: ...\n<b>Rationale:</b>\n<b>Primary Signals:</b> ...\n<b>Lagging Indicators:</b> ...\n<b>Sentiment Analysis:</b> ...\n",
+        "options": {
+          "systemMessage": "=You are a highly intelligent and accurate sentiment analyzer specializing in cryptocurrency markets.\n\nUse \"Research\" tool to Research additional reliable market insights, news, and analysis to enrich conclusions and validate signals.\n\nMake sure to use the above tool before giving any output"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2864,
+        336
+      ],
+      "id": "5764328c-f5e7-447a-88ef-eebf316ac6f0",
+      "name": "Response based on data1"
+    },
+    {
+      "parameters": {
+        "model": "sonar",
+        "messages": {
+          "message": [
+            {
+              "content": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('message0_Text', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        528
+      ],
+      "id": "cde101e9-81e9-4ad5-b16d-f648bd1b3891",
+      "name": "Research",
+      "credentials": {
+        "perplexityApi": {
+          "id": "8cVcmmGLJkKkmDNW",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0].json.output;\n\n// --- Utility functions ---\nfunction extractBetween(text, start, end) {\n  const regex = new RegExp(`${start}[\\\\s\\\\S]*?(?=${end}|$)`, \"i\");\n  const match = text.match(regex);\n  return match ? match[0] : \"\";\n}\n\nfunction extractField(section, field) {\n  const regex = new RegExp(`${field}:\\\\s*([^\\\\n<]+)`, \"i\");\n  const match = section.match(regex);\n  return match ? match[1].trim() : null;\n}\n\nfunction extractRationale(section, label, nextLabels = []) {\n  let pattern;\n  if (nextLabels.length > 0) {\n    pattern = `<b>${label}:<\\/b>[\\\\s\\\\S]*?(?=${nextLabels.map(l => `<b>${l}`).join(\"|\")}|$)`;\n  } else {\n    // take everything until the end of the section\n    pattern = `<b>${label}:<\\/b>[\\\\s\\\\S]*`;\n  }\n  const regex = new RegExp(pattern, \"i\");\n  const match = section.match(regex);\n  if (!match) return null;\n  return match[0]\n    .replace(new RegExp(`<b>${label}:<\\/b>`, \"i\"), \"\")\n    .replace(/\\n+/g, \" \")\n    .trim();\n}\n\n// --- Extract Sections ---\nconst spotBlock = extractBetween(input, \"<b>Spot Recommendations</b>\", \"<b>Leveraged Recommendations</b>\");\nconst levBlock = extractBetween(input, \"<b>Leveraged Recommendations</b>\", \"$$END$$\");\n\n// --- Spot Short-Term ---\nconst spotShort = extractBetween(spotBlock, \"<b>Short-Term</b>\", \"<b>Long-Term</b>\");\nconst spotShortObj = {\n  action: extractField(spotShort, \"Action\"),\n  entryPrice: extractField(spotShort, \"Entry Price\"),\n  stopLoss: extractField(spotShort, \"Stop Loss\"),\n  takeProfit: extractField(spotShort, \"Take Profit\"),\n  rationale: {\n    primarySignals: extractRationale(spotShort, \"Primary Signals\", [\"Lagging Indicators\", \"Sentiment Analysis\"]),\n    laggingIndicators: extractRationale(spotShort, \"Lagging Indicators\", [\"Sentiment Analysis\"]),\n    sentiment: extractRationale(spotShort, \"Sentiment Analysis\") // now until end\n  }\n};\n\n// --- Spot Long-Term ---\nconst spotLong = extractBetween(spotBlock, \"<b>Long-Term</b>\", \"$$END$$\");\nconst spotLongObj = {\n  action: extractField(spotLong, \"Action\"),\n  entryPrice: extractField(spotLong, \"Entry Price\"),\n  stopLoss: extractField(spotLong, \"Stop Loss\"),\n  takeProfit: extractField(spotLong, \"Take Profit\"),\n  rationale: {\n    primarySignals: extractRationale(spotLong, \"Primary Signals\", [\"Lagging Indicators\", \"Sentiment Analysis\"]),\n    laggingIndicators: extractRationale(spotLong, \"Lagging Indicators\", [\"Sentiment Analysis\"]),\n    sentiment: extractRationale(spotLong, \"Sentiment Analysis\") // fixed\n  }\n};\n\n// --- Leveraged Short-Term ---\nconst levShort = extractBetween(levBlock, \"<b>Short-Term</b>\", \"<b>Long-Term</b>\");\nconst levShortObj = {\n  position: extractField(levShort, \"Position\"),\n  leverage: extractField(levShort, \"Leverage\"),\n  entryPrice: extractField(levShort, \"Entry Price\"),\n  stopLoss: extractField(levShort, \"Stop Loss\"),\n  takeProfit: extractField(levShort, \"Take Profit\"),\n  rationale: {\n    primarySignals: extractRationale(levShort, \"Primary Signals\", [\"Lagging Indicators\", \"Sentiment Analysis\"]),\n    laggingIndicators: extractRationale(levShort, \"Lagging Indicators\", [\"Sentiment Analysis\"]),\n    sentiment: extractRationale(levShort, \"Sentiment Analysis\") // fixed\n  }\n};\n\n// --- Leveraged Long-Term ---\nconst levLong = extractBetween(levBlock, \"<b>Long-Term</b>\", \"$$END$$\");\nconst levLongObj = {\n  position: extractField(levLong, \"Position\"),\n  leverage: extractField(levLong, \"Leverage\"),\n  entryPrice: extractField(levLong, \"Entry Price\"),\n  stopLoss: extractField(levLong, \"Stop Loss\"),\n  takeProfit: extractField(levLong, \"Take Profit\"),\n  rationale: {\n    primarySignals: extractRationale(levLong, \"Primary Signals\", [\"Lagging Indicators\", \"Sentiment Analysis\"]),\n    laggingIndicators: extractRationale(levLong, \"Lagging Indicators\", [\"Sentiment Analysis\"]),\n    sentiment: extractRationale(levLong, \"Sentiment Analysis\") // fixed\n  }\n};\n\n// --- Final JSON ---\nreturn [\n  {\n    json: {\n      spot: {\n        shortTerm: spotShortObj,\n        longTerm: spotLongObj,\n      },\n      leveraged: {\n        shortTerm: levShortObj,\n        longTerm: levLongObj,\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3328,
+        416
+      ],
+      "id": "915f6bd7-c2d2-440c-ae99-345911399b15",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"shortTermAnalysis\": \"Summary of short-term trends or insights.\",\n  \"longTermAnalysis\": \"Summary of long-term trends or projections.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2464,
+        512
+      ],
+      "id": "aa6ae237-ae97-4867-b6a2-9f32264fc02e",
+      "name": "Structured1"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Crypto Trading Recommendations</title>\n  <style>\n    body {\n      font-family: \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;\n      background-color: #f4f6f9;\n      margin: 0;\n      padding: 20px;\n      color: #333;\n    }\n\n    h1 {\n      text-align: center;\n      color: #6B0F1A;\n      margin-bottom: 30px;\n    }\n\n    .section {\n      background: #fff;\n      border-radius: 10px;\n      padding: 20px;\n      margin-bottom: 25px;\n      box-shadow: 0 2px 8px rgba(0,0,0,0.05);\n    }\n\n    .section h2 {\n      margin-top: 0;\n      color: #6B0F1A;\n      border-bottom: 2px solid #1a73e8;\n      padding-bottom: 5px;\n    }\n\n    .recommendation {\n      margin-bottom: 20px;\n    }\n\n    .recommendation h3 {\n      margin: 10px 0;\n      color: #6B0F1A;\n    }\n\n    .field {\n      margin: 5px 0;\n    }\n\n    .field span {\n      font-weight: bold;\n      color: #000000;\n    }\n\n    .rationale {\n      margin-top: 10px;\n      background: #f9fbfd;\n      padding: 10px;\n      border-radius: 6px;\n      font-size: 0.95em;\n      line-height: 1.5;\n    }\n\n    .rationale h4 {\n      margin: 10px 0 5px;\n      color: #555;\n    }\n  </style>\n</head>\n<body>\n  <h1>Crypto Trading Recommendations</h1>\n\n  <!-- Spot Recommendations -->\n  <div class=\"section\">\n    <h2>Spot Recommendations</h2>\n\n    <!-- Short Term -->\n    <div class=\"recommendation\">\n      <h3>Short Term</h3>\n      <div class=\"field\"><span>Action:</span> {{ $json.spot.shortTerm.action }}</div>\n      <div class=\"field\"><span>Entry Price:</span> {{ $json.spot.shortTerm.entryPrice }}</div>\n      <div class=\"field\"><span>Stop Loss:</span> {{ $json.spot.shortTerm.stopLoss }}</div>\n      <div class=\"field\"><span>Take Profit:</span> {{ $json.spot.shortTerm.takeProfit }}</div>\n\n      <div class=\"rationale\">\n        <h4>Primary Signals</h4>\n        {{ $json.spot.shortTerm.rationale.primarySignals }}\n        <h4>Lagging Indicators</h4>\n        {{ $json.spot.shortTerm.rationale.laggingIndicators }}\n        <h4>Sentiment</h4>\n        {{ $json.spot.shortTerm.rationale.sentiment }}\n      </div>\n    </div>\n\n    <!-- Long Term -->\n    <div class=\"recommendation\">\n      <h3>Long Term</h3>\n      <div class=\"field\"><span>Action:</span> {{ $json.spot.longTerm.action }}</div>\n      <div class=\"field\"><span>Entry Price:</span> {{ $json.spot.longTerm.entryPrice }}</div>\n      <div class=\"field\"><span>Stop Loss:</span> {{ $json.spot.longTerm.stopLoss }}</div>\n      <div class=\"field\"><span>Take Profit:</span> {{ $json.spot.longTerm.takeProfit }}</div>\n\n      <div class=\"rationale\">\n        <h4>Primary Signals</h4>\n        {{ $json.spot.longTerm.rationale.primarySignals }}\n        <h4>Lagging Indicators</h4>\n        {{ $json.spot.longTerm.rationale.laggingIndicators }}\n        <h4>Sentiment</h4>\n        {{ $json.spot.longTerm.rationale.sentiment }}\n      </div>\n    </div>\n  </div>\n\n  <!-- Leveraged Recommendations -->\n  <div class=\"section\">\n    <h2>Leveraged Recommendations</h2>\n\n    <!-- Short Term -->\n    <div class=\"recommendation\">\n      <h3>Short Term</h3>\n      <div class=\"field\"><span>Position:</span> {{ $json.leveraged.shortTerm.position }}</div>\n      <div class=\"field\"><span>Leverage:</span> {{ $json.leveraged.shortTerm.leverage }}</div>\n      <div class=\"field\"><span>Entry Price:</span> {{ $json.leveraged.shortTerm.entryPrice }}</div>\n      <div class=\"field\"><span>Stop Loss:</span> {{ $json.leveraged.shortTerm.stopLoss }}</div>\n      <div class=\"field\"><span>Take Profit:</span> {{ $json.leveraged.shortTerm.takeProfit }}</div>\n\n      <div class=\"rationale\">\n        <h4>Primary Signals</h4>\n        {{ $json.leveraged.shortTerm.rationale.primarySignals }}\n        <h4>Lagging Indicators</h4>\n        {{ $json.leveraged.shortTerm.rationale.laggingIndicators }}\n        <h4>Sentiment</h4>\n        {{ $json.leveraged.shortTerm.rationale.sentiment }}\n      </div>\n    </div>\n\n    <!-- Long Term -->\n    <div class=\"recommendation\">\n      <h3>Long Term</h3>\n      <div class=\"field\"><span>Position:</span> {{ $json.leveraged.longTerm.position }}</div>\n      <div class=\"field\"><span>Leverage:</span> {{ $json.leveraged.longTerm.leverage }}</div>\n      <div class=\"field\"><span>Entry Price:</span> {{ $json.leveraged.longTerm.entryPrice }}</div>\n      <div class=\"field\"><span>Stop Loss:</span> {{ $json.leveraged.longTerm.stopLoss }}</div>\n      <div class=\"field\"><span>Take Profit:</span> {{ $json.leveraged.longTerm.takeProfit }}</div>\n\n      <div class=\"rationale\">\n        <h4>Primary Signals</h4>\n        {{ $json.leveraged.longTerm.rationale.primarySignals }}\n        <h4>Lagging Indicators</h4>\n        {{ $json.leveraged.longTerm.rationale.laggingIndicators }}\n        <h4>Sentiment</h4>\n        {{ $json.leveraged.longTerm.rationale.sentiment }}\n      </div>\n    </div>\n  </div>\n<div class=\"section\" style=\"background:#fff3cd; border:1px solid #ffeeba; color:#856404; font-size:0.9em; text-align:center; margin-top:30px; padding:15px; border-radius:8px;\">\n  <strong>Disclaimer:</strong> This information is provided for educational and informational purposes only and does not constitute financial, investment, or trading advice. \n  Cryptocurrency markets are highly volatile and you should do your own research or consult with a qualified financial advisor before making investment decisions.\n  Our main motive is to give you a overview of the market\n</div>\n\n</body>\n</html>\n"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        3504,
+        416
+      ],
+      "id": "1c69090e-e9f9-450a-b1c1-86f5fb0c4ea0",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "content": "## HTML STRUCTURED",
+        "height": 240,
+        "width": 464,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3264,
+        352
+      ],
+      "typeVersion": 1,
+      "id": "1280f75f-5214-4c68-92c8-96c110e7a9ad",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "**Enter the name of coin (e.g. BTC)**",
+        "height": 192,
+        "width": 208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1920,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "cc2dd21b-f984-4657-b5bb-48a8d77bb73a",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        1968,
+        -48
+      ],
+      "id": "a5ea2b03-c815-4179-aa14-41dac99736f6",
+      "name": "Enter coin",
+      "webhookId": "9e83f203-9e7b-427b-8d08-447bf55fc617"
+    },
+    {
+      "parameters": {
+        "content": "## CYRPTO ANALYZER ADV. VERSION\n**It has research capabilities to research the market with perplexity based on the news API news**",
+        "height": 976,
+        "width": 2128,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1776,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "cea8ca4c-b3e3-44bb-8be8-7f69c99fa3f7",
+      "name": "CRPTO ANALYZER V-2"
+    },
+    {
+      "parameters": {
+        "content": "## CYRPTO ANALYZER \n",
+        "height": 976,
+        "width": 1840,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -560,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "dbe52dff-b6ac-4283-8391-8c16d66afed0",
+      "name": "CRPTO "
+    }
+  ],
+  "pinData": {
+    "Sentiment Analysis1": [
+      {
+        "json": {
+          "output": {
+            "shortTermAnalysis": "Category: Negative, Score: -0.4. Rationale: The short-term sentiment is negative due to a significant Bitcoin price crash, highlighted by 'Bitcoin Plummets After New All-Time High, Over $100 Billion Wiped from Crypto Market'. This immediate market reaction was compounded by critical security incidents, notably a 'Monero Hit by 51% Attack; Kraken Pauses XMR Deposits' and a community vote to target Dogecoin. Further contributing to caution are high-profile legal developments such as 'Terra/Luna Creator Do Kwon Pleads Guilty to Fraud Charges' and ongoing cybercrime issues including 'Crypto Influencer Sentenced for Large-Scale Cryptojacking' and the discovery of the 'ERMAC 3.0 Android Trojan Source Code Leak Reveals Expanding Threat'. Additionally, 'Spot Ether ETFs See Outflows After Nearly Two-Week Inflow Streak' indicates a short-term cooling of institutional interest in ETH, all contributing to a volatile and cautious immediate outlook.",
+            "longTermAnalysis": "Category: Positive, Score: 0.7. Rationale: The long-term outlook for the cryptocurrency market is predominantly positive, driven by accelerating institutional adoption and proactive regulatory advancements. 'Wall Street Ramps Up Crypto Exposure: Significant Investment in Bitcoin ETFs and Related Stocks' and 'Institutional Appetite for Ether Shows No Sign of Slowing with $882 Million ETH Purchases' signal a strong and growing integration into traditional finance. Regulatory clarity is improving globally, with the 'Trump Administration Continues Push for Crypto Adoption with GENIUS Act Codifying Stablecoins', 'Japan to Approve Yen-Denominated Stablecoins as Early as This Fall', and 'Thailand Plans Nationwide Regulatory Sandbox for Crypto Tourism' reflecting broad governmental engagement. Strategic endorsements from key figures like 'BlackRock CIO Rick Rieder Cites Current Backdrop as 'Best Investment Environment Ever'' and 'Ray Dalio Advises 15% Portfolio Allocation to Crypto or Gold' further validate crypto's long-term investment appeal. Significant infrastructure developments, such as 'Wellgistics Health Inc. Deploys XRP Ledger-Based Payment System for Thousands of Pharmacies' and the 'US Bitcoin Mining Industry Gets Disruptive Upgrade', alongside discussions by 'S&P Dow Jones Indices in Discussions to License Tokenized Benchmarks', underscore the ecosystem's maturation. While concerns over fraud persist, as highlighted by 'Asia's Cryptoverse Loses Over $1.5 Billion to Scams in H1 2025', the fundamental shift towards mainstream legitimization and robust development indicates strong long-term growth potential."
+          }
+        }
+      }
+    ],
+    "Response based on data1": [
+      {
+        "json": {
+          "output": "<b>Spot Recommendations</b>\n\n<b>Short-Term</b>\nAction: Sell\nEntry Price: $115,500\nStop Loss: $117,000\nTake Profit: $112,000\n<b>Rationale:</b>\n<b>Primary Signals:</b> The daily candlestick shows a significant price crash from $116,227 to $114,986, reinforcing the initial negative short-term sentiment. The current price is below the researched critical short-term support level of $116,800, turning it into a potential resistance. The retest area for potential short setups is identified between $115,500 and $116,500. While some bullish technical signals like a bullish engulfing pattern around $117,000 and positive MACD divergence were noted in research, these may indicate attempts at a bounce towards resistance rather than a full reversal in the immediate aftermath of a significant drop. The 15-minute and 1-hour candles show the price hovering around $114,900, suggesting continued weakness or consolidation at lower levels.\n<b>Lagging Indicators:</b> Initial sentiment categorizes the short-term outlook as \"Negative\" with a score of -0.4, directly citing the Bitcoin price crash and significant market capital wiped out, compounded by security incidents and legal developments. This immediate market reaction suggests strong selling pressure.\n<b>Sentiment Analysis:</b> The short-term sentiment is negative, primarily driven by the recent Bitcoin price crash, significant market cap reduction, and ongoing negative news such as security breaches (Monero, Dogecoin targeting), legal issues (Terra/Luna, cryptojacking), and outflows from Spot Ether ETFs. This overall environment contributes to a cautious and volatile immediate outlook.\n\n<b>Long-Term</b>\nAction: Buy\nEntry Price: $114,900\nStop Loss: $110,000\nTake Profit: $140,000\n<b>Rationale:</b>\n<b>Primary Signals:</b> The long-term outlook is strongly bullish. Analysts project BTC to reach $140,000 to $150,000 by late 2025 or early 2026, driven by robust institutional interest and favorable macroeconomic conditions. Key Fibonacci extensions support these targets. Strong institutional demand, including inflows into Bitcoin ETFs and interest from sovereign wealth funds, indicates continued integration into traditional finance. The \"sleeping\" BTC wallets transferring coins suggest renewed activity by long-term holders, a typically bullish sign.\n<b>Lagging Indicators:</b> The long-term sentiment is categorized as \"Positive\" with a score of 0.7, supported by accelerating institutional adoption and proactive regulatory advancements globally (e.g., Wall Street increasing crypto exposure, Japan and Thailand stablecoin regulations, BlackRock CIO's positive outlook, Ray Dalio's crypto allocation advice). Significant infrastructure developments like XRP Ledger-based payment systems and upgrades in the US Bitcoin mining industry further underscore market maturation.\n<b>Sentiment Analysis:</b> The long-term sentiment is predominantly positive. This is fueled by increasing institutional adoption, improving regulatory clarity worldwide, strategic endorsements from major financial figures, and ongoing infrastructure development within the crypto ecosystem. Despite persistent concerns over fraud, the fundamental shift towards mainstream legitimization and robust development points to strong sustained growth potential.\n\n<b>Leveraged Recommendations</b>\n\n<b>Short-Term</b>\nPosition: Short\nLeverage: 3x - 5x\nEntry Price: $115,500\nStop Loss: $117,000\nTake Profit: $112,000\n<b>Rationale:</b>\n<b>Primary Signals:</b> Consistent with the spot short-term analysis, the recent significant price drop and the current price trading below previous support levels suggest a bearish continuation or retest of resistance. The chosen leverage is low to moderate to mitigate the inherent risks associated with high volatility and potential for quick price swings in the immediate aftermath of a crash.\n<b>Lagging Indicators:</b> The overwhelmingly negative short-term sentiment stemming from the recent market downturn supports a cautious, bearish position for immediate price action.\n<b>Sentiment Analysis:</b> The negative sentiment from the recent market events and the continued uncertainty contribute to a higher-risk short-term environment, necessitating conservative leverage for any trading positions.\n\n<b>Long-Term</b>\nPosition: Long\nLeverage: 2x - 3x\nEntry Price: $114,900\nStop Loss: $110,000\nTake Profit: $140,000\n<b>Rationale:</b>\n<b>Primary Signals:</b> The strong long-term bullish outlook, supported by projected price targets and ongoing institutional and regulatory developments, forms the basis for a leveraged long position. The low leverage is advised to allow for market fluctuations and potential corrections without excessive liquidation risk, aligning with a long-term investment horizon.\n<b>Lagging Indicators:</b> The highly positive long-term sentiment, driven by foundational shifts in crypto adoption and validation from traditional finance, provides a strong backing for a long position.\n<b>Sentiment Analysis:</b> The positive long-term sentiment indicates a favorable environment for sustained growth, making a leveraged long position appealing, provided leverage is kept conservative to weather any short-term volatility."
+        }
+      }
+    ],
+    "Code": [
+      {
+        "json": {
+          "spot": {
+            "shortTerm": {
+              "action": "Sell",
+              "entryPrice": "$115,500",
+              "stopLoss": "$117,000",
+              "takeProfit": "$112,000",
+              "rationale": {
+                "primarySignals": "The daily candlestick shows a significant price crash from $116,227 to $114,986, reinforcing the initial negative short-term sentiment. The current price is below the researched critical short-term support level of $116,800, turning it into a potential resistance. The retest area for potential short setups is identified between $115,500 and $116,500. While some bullish technical signals like a bullish engulfing pattern around $117,000 and positive MACD divergence were noted in research, these may indicate attempts at a bounce towards resistance rather than a full reversal in the immediate aftermath of a significant drop. The 15-minute and 1-hour candles show the price hovering around $114,900, suggesting continued weakness or consolidation at lower levels.",
+                "laggingIndicators": "Initial sentiment categorizes the short-term outlook as \"Negative\" with a score of -0.4, directly citing the Bitcoin price crash and significant market capital wiped out, compounded by security incidents and legal developments. This immediate market reaction suggests strong selling pressure.",
+                "sentiment": "The short-term sentiment is negative, primarily driven by the recent Bitcoin price crash, significant market cap reduction, and ongoing negative news such as security breaches (Monero, Dogecoin targeting), legal issues (Terra/Luna, cryptojacking), and outflows from Spot Ether ETFs. This overall environment contributes to a cautious and volatile immediate outlook."
+              }
+            },
+            "longTerm": {
+              "action": "Buy",
+              "entryPrice": "$114,900",
+              "stopLoss": "$110,000",
+              "takeProfit": "$140,000",
+              "rationale": {
+                "primarySignals": "The long-term outlook is strongly bullish. Analysts project BTC to reach $140,000 to $150,000 by late 2025 or early 2026, driven by robust institutional interest and favorable macroeconomic conditions. Key Fibonacci extensions support these targets. Strong institutional demand, including inflows into Bitcoin ETFs and interest from sovereign wealth funds, indicates continued integration into traditional finance. The \"sleeping\" BTC wallets transferring coins suggest renewed activity by long-term holders, a typically bullish sign.",
+                "laggingIndicators": "The long-term sentiment is categorized as \"Positive\" with a score of 0.7, supported by accelerating institutional adoption and proactive regulatory advancements globally (e.g., Wall Street increasing crypto exposure, Japan and Thailand stablecoin regulations, BlackRock CIO's positive outlook, Ray Dalio's crypto allocation advice). Significant infrastructure developments like XRP Ledger-based payment systems and upgrades in the US Bitcoin mining industry further underscore market maturation.",
+                "sentiment": "The long-term sentiment is predominantly positive. This is fueled by increasing institutional adoption, improving regulatory clarity worldwide, strategic endorsements from major financial figures, and ongoing infrastructure development within the crypto ecosystem. Despite persistent concerns over fraud, the fundamental shift towards mainstream legitimization and robust development points to strong sustained growth potential."
+              }
+            }
+          },
+          "leveraged": {
+            "shortTerm": {
+              "position": "Short",
+              "leverage": "3x - 5x",
+              "entryPrice": "$115,500",
+              "stopLoss": "$117,000",
+              "takeProfit": "$112,000",
+              "rationale": {
+                "primarySignals": "Consistent with the spot short-term analysis, the recent significant price drop and the current price trading below previous support levels suggest a bearish continuation or retest of resistance. The chosen leverage is low to moderate to mitigate the inherent risks associated with high volatility and potential for quick price swings in the immediate aftermath of a crash.",
+                "laggingIndicators": "The overwhelmingly negative short-term sentiment stemming from the recent market downturn supports a cautious, bearish position for immediate price action.",
+                "sentiment": "The negative sentiment from the recent market events and the continued uncertainty contribute to a higher-risk short-term environment, necessitating conservative leverage for any trading positions."
+              }
+            },
+            "longTerm": {
+              "position": "Long",
+              "leverage": "2x - 3x",
+              "entryPrice": "$114,900",
+              "stopLoss": "$110,000",
+              "takeProfit": "$140,000",
+              "rationale": {
+                "primarySignals": "The strong long-term bullish outlook, supported by projected price targets and ongoing institutional and regulatory developments, forms the basis for a leveraged long position. The low leverage is advised to allow for market fluctuations and potential corrections without excessive liquidation risk, aligning with a long-term investment horizon.",
+                "laggingIndicators": "The highly positive long-term sentiment, driven by foundational shifts in crypto adoption and validation from traditional finance, provides a strong backing for a long position.",
+                "sentiment": "The positive long-term sentiment indicates a favorable environment for sustained growth, making a leveraged long position appealing, provided leverage is kept conservative to weather any short-term volatility."
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "15 min": {
+      "main": [
+        [
+          {
+            "node": "data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "60mins": {
+      "main": [
+        [
+          {
+            "node": "data2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data1": {
+      "main": [
+        [
+          {
+            "node": "60mins",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data2": {
+      "main": [
+        [
+          {
+            "node": "24hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "24hours": {
+      "main": [
+        [
+          {
+            "node": "data3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data3": {
+      "main": [
+        [
+          {
+            "node": "1month",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1month": {
+      "main": [
+        [
+          {
+            "node": "data4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data4": {
+      "main": [
+        [
+          {
+            "node": "news",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "news": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.5 Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Strcuture": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Response based on data",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.5 Pro": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Response based on data",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Response based on data",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Response based on data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "15 min",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response based on data": {
+      "main": [
+        [
+          {
+            "node": "Respond Back",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "15 min1": {
+      "main": [
+        [
+          {
+            "node": "data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "60mins1": {
+      "main": [
+        [
+          {
+            "node": "data5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data": {
+      "main": [
+        [
+          {
+            "node": "60mins1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data5": {
+      "main": [
+        [
+          {
+            "node": "24hours1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data6": {
+      "main": [
+        [
+          {
+            "node": "1month1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "24hours1": {
+      "main": [
+        [
+          {
+            "node": "data6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1month1": {
+      "main": [
+        [
+          {
+            "node": "data7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "data7": {
+      "main": [
+        [
+          {
+            "node": "news1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "news1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.5 Flash1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Response based on data1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis1": {
+      "main": [
+        [
+          {
+            "node": "Response based on data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response based on data1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research": {
+      "ai_tool": [
+        [
+          {
+            "node": "Response based on data1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Sentiment Analysis1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enter coin": {
+      "main": [
+        [
+          {
+            "node": "15 min1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "eeb2d450-231d-42db-94cc-bfd0fd8eaa8a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "94d132d9666401022266a056fe800141caf8876703229948f8b6037f65c93cae"
+  },
+  "id": "5nUOrDkQuPVJt4Dq",
+  "tags": []
+}
