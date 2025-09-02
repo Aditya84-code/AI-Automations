@@ -1,0 +1,309 @@
+{
+  "name": "Nano Banana",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## NANO BANANA (FREE)",
+        "height": 304,
+        "width": 1552
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "410ebe07-1936-4cd7-a0f9-28dbfc30e2b3",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Role & Persona\n\nYou are a professional UGC content creator and lifestyle photographer, hired by a luxury brand to create authentic yet premium social media ads.\n\nTask\n\nGenerate a photorealistic image of {{ $json.message.text }} in a UGC-style setting that looks like it was shot by a real customer by their DSLR but has high-end visual polish.\n\nVisual Style Guidelines\n\nLighting: Natural daylight, soft shadows, no harsh studio lights\n\nAesthetic: Minimalist, premium, aspirational but relatable\n\nColor Palette: Neutral tones with slight warmth, realistic skin tones, vibrant but not oversaturated\n\nComposition: Rule of thirds or centered framing, product in clear hero position\n\nDepth of Field: Subtle background blur, product in crisp focus\n\nTexture: Show tactile detail (glass shine, fabric softness, water droplets if relevant)\n\nScene Setup\n\nEnvironment should feel authentic: a cozy room, bathroom counter, kitchen table, desk setup, or outdoor casual lifestyle\n\nProps should match lifestyle but never distract (e.g., plants, books, candles, coffee cup)\n\nProduct can be held by a hand (authentic testimonial feel) or placed naturally on a surface\n\nBrand Voice Capture\n\nFeels trustworthy, like a satisfied customer proudly sharing on Instagram/TikTok\n\nNot over-produced or fake — premium authenticity\n\nModern, relatable, premium lifestyle\n\nOutput Requirements\n\nPhotorealistic\n\nReady-to-use for social ads (Instagram / TikTok style)\n\nEmphasize the product as the hero without looking like a sterile catalog photo\n\nPrompt Example\nGenerate a premium UGC-style ad photo for a luxury skincare serum. The scene is a clean bathroom counter with soft daylight filtering in. A hand with natural nails gently holds the glass serum bottle with water droplets on the skin, symbolizing freshness. The background is blurred, showing subtle details like a plant and a folded towel. The product is sharply in focus, centered, and feels authentic yet aspirational. The shot must look like a real TikTok beauty influencer captured it on their phone, but polished for an ad campaign.\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        0
+      ],
+      "id": "76241025-1caa-4bd7-a49e-d991657814a4",
+      "name": "Prompt Enhancer",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xx4kQmy3wpd48Tur",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get input data\nconst input = items[0].json;\n\n// Extract the text field (it's a JSON string inside)\nconst rawText = input.content.parts[0].text;\n\n// Parse the inner JSON to get the prompt\nconst parsed = JSON.parse(rawText);\n\n// Return the extracted prompt\nreturn [\n  {\n    json: {\n      prompt: parsed.image_description\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ],
+      "id": "860af96d-d477-4bc1-9829-82cb7c6d32f3",
+      "name": "prompt extract"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/gemini-2.5-flash-image-preview:free\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $json.prompt }}\"\n        }\n      ]\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "7319c5e7-6c59-476b-a70b-dce1480fbcc3",
+      "name": "Nano Banana",
+      "credentials": {
+        "openRouterApi": {
+          "id": "01twUYbk1RMjeYZN",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5466bd18-3465-49f9-bff3-43ac68df1654",
+              "name": "data",
+              "value": "={{$json[\"choices\"][0][\"message\"][\"images\"][0][\"image_url\"][\"url\"].split(\",\")[1]}}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        864,
+        0
+      ],
+      "id": "2d1c466a-218e-4639-9459-dd063ec846f2",
+      "name": "Img Url"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "78065194-b3c0-451f-b3dc-156f2d05bdc4",
+      "name": "Image"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "a6afc187-b189-4a4c-8b7f-59997294ab3d",
+      "name": "Telegram Trigger",
+      "webhookId": "7f0406df-d5a7-4bbc-aa99-aea5cdf62bff",
+      "credentials": {
+        "telegramApi": {
+          "id": "iqFxm5ad1bhxUzcH",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1248,
+        0
+      ],
+      "id": "43e880cf-a34a-41a7-a64e-1c95ddb46bc8",
+      "name": "Send a photo message",
+      "webhookId": "4c6d7fd0-a536-4732-843d-fc16ef69f609",
+      "credentials": {
+        "telegramApi": {
+          "id": "iqFxm5ad1bhxUzcH",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 697168043,
+          "message": {
+            "message_id": 147,
+            "from": {
+              "id": 6315873124,
+              "is_bot": false,
+              "first_name": "Reet",
+              "username": "Reet555",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 6315873124,
+              "first_name": "Reet",
+              "username": "Reet555",
+              "type": "private"
+            },
+            "date": 1756479163,
+            "text": "A cute puppy holding KFC bucket"
+          }
+        }
+      }
+    ],
+    "Prompt Enhancer": [
+      {
+        "json": {
+          "content": {
+            "parts": [
+              {
+                "text": "{\n  \"image_description\": \"Generate a photorealistic image for a social media ad. The scene features an adorable golden retriever puppy, about 10 weeks old, gently holding a miniature KFC fried chicken bucket in its mouth, looking directly at the camera with innocent, curious eyes. The setting is a cozy, sun-drenched living room with natural daylight streaming in from a large window, creating soft, warm shadows and a gentle glow. The puppy is sitting on a plush, light-colored knitted blanket on a clean, modern hardwood floor. In the subtly blurred background, a minimalist side table with a small, elegant houseplant and a stack of aspirational lifestyle magazines adds to the premium, yet relatable aesthetic, without distracting from the main subject. The KFC bucket is in crisp focus, its iconic red and white design vibrant but not oversaturated, emphasizing its subtle texture. The puppy's soft fur and the slight crinkle of the bucket's paper are clearly visible, showcasing tactile detail. The overall composition uses the rule of thirds, with the puppy and product as the clear heroes, conveying a trustworthy, authentic, and modern lifestyle feel, as if captured by a discerning customer with a high-end DSLR for an Instagram post. The color palette is dominated by neutral tones with a slight warmth, allowing the KFC red to pop in a sophisticated way.\"\n}"
+              }
+            ],
+            "role": "model"
+          },
+          "finishReason": "STOP",
+          "index": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Prompt Enhancer": {
+      "main": [
+        [
+          {
+            "node": "prompt extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prompt extract": {
+      "main": [
+        [
+          {
+            "node": "Nano Banana",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nano Banana": {
+      "main": [
+        [
+          {
+            "node": "Img Url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Img Url": {
+      "main": [
+        [
+          {
+            "node": "Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prompt Enhancer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image": {
+      "main": [
+        [
+          {
+            "node": "Send a photo message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "ec0d3d8b-0aa5-4f3e-9d96-ebec688af32b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "00acdf9e2cc0dac7480f55abff24f87b8641ebe8a8fbb017dd912052f3804db2"
+  },
+  "id": "bKPDCgwEHvDfncCh",
+  "tags": []
+}
